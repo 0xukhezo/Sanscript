@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
+import Displayer from "../components/Displayer/Displayer";
 import { newsLettersTest } from "../testNewLetter/testNewLetter";
 import { client, NewsLetters } from "./api/Newsletters";
 
@@ -67,5 +68,17 @@ export default function Home() {
     setNewsLetters(filteredOtherNewsLetters);
   }, [address]);
 
-  return <main>eth paris</main>;
+  return (
+    <main>
+      {newsLetters && newsLettersSubscribed && newsLettersOwned ? (
+        <Displayer
+          newsLetters={newsLetters}
+          newsLettersSubscribed={newsLettersSubscribed}
+          newsLettersOwned={newsLettersOwned}
+        />
+      ) : (
+        <div>Loading...</div>
+      )}
+    </main>
+  );
 }
