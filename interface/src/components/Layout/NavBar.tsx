@@ -18,7 +18,7 @@ import { EmbedSDK } from "@pushprotocol/uiembed";
 const WEB3AUTH_CLIENT_ID = process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID;
 const INFURA_KEY = process.env.NEXT_PUBLIC_INFURA_KEY;
 
-const AppBar = () => {
+export default function NavBar() {
   const { connect } = useConnect({
     connector: new InjectedConnector(),
   });
@@ -139,6 +139,4 @@ const AppBar = () => {
       </div>
     </main>
   );
-};
-
-export default AppBar;
+}
