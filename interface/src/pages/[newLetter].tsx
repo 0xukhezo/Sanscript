@@ -4,11 +4,13 @@ import WalletFund from "@/components/OnrampSafe/WalletFund";
 import Chat from "@/components/Chat/Chat";
 import { ethers } from "ethers";
 import ImageIpfsDisplay from "@/components/ImageIpfsDisplay/ImageIpfsDisplay";
+import NavBar from "@/components/Layout/NavBar";
 
 let PEER_ADDRESS = "0xB59A5a10E7543AbfBd10D593834AE959f54BCB8C";
 
 export default function NewLetter() {
   const [eoa, setEoa] = useState<string>("");
+  const [status, setStatus] = useState<boolean>(false);
   const [messages, setMessages] = useState<any>(null);
   const [writeReadView, setWriteReadView] = useState<boolean>(false);
   const convRef = useRef<any>(null);
@@ -72,6 +74,10 @@ export default function NewLetter() {
     }
   }, []);
 
+  const getStatus = (statusNavbar: boolean) => {
+    setStatus(statusNavbar);
+  };
+
   useEffect(() => {
     setEoa(localStorage.getItem("eoa") as string);
   }, [eoa]);
@@ -94,8 +100,13 @@ export default function NewLetter() {
     }
   }, [messages, isOnNetwork]);
 
+  useEffect(() => {
+    setEoa(localStorage.getItem("eoa") as string);
+  }, [status]);
+
   return (
     <>
+      <NavBar getStatus={getStatus} />
       {writeReadView ? (
         <div className="p-20">
           <button

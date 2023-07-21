@@ -34,6 +34,9 @@ module.exports = {
         darkButtonVideo: "#1D1D1D",
         blogHoverLinks: "#FF4700",
       },
+      borderWidth: {
+        1: "0.5px",
+      },
     },
   },
   plugins: [],

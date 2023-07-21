@@ -1,15 +1,12 @@
 import { abi } from "@/abis/abis";
 import { ethers } from "ethers";
 import React, { useState, useEffect } from "react";
-import {
-  useContractWrite,
-  usePrepareContractWrite,
-  useWaitForTransaction,
-} from "wagmi";
-
+import { useWaitForTransaction } from "wagmi";
+import detectEthereumProvider from "@metamask/detect-provider";
 import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import { Web3AuthOptions } from "@web3auth/modal";
+import { MetaMaskSDK } from "@metamask/sdk";
 
 import { create } from "ipfs-http-client";
 import { Web3AuthModalPack } from "../../utils";
@@ -43,36 +40,6 @@ export default function NewNewsLetterForm({
 
   const usdcfake = "0xBCc6f06b6d41732db56924A4B140fEa2d998F571";
   const lockAddress = "0x727aEBCDF805905bcF80292109dc05eb485330B7";
-
-  const { config: approveContractConfig } = usePrepareContractWrite({
-    address: usdcfake,
-    abi: abi.usdcFake,
-    functionName: "approve",
-    args: [lockAddress, ethers.utils.parseEther(price.toString()).toString()],
-  });
-
-  const { config: createNewsLetterContractConfig } = usePrepareContractWrite({
-    address: lockAddress,
-    abi: abi.subsblockAbi,
-    functionName: "addNewsletter",
-    args: [ipfsLink, title, description, price],
-  });
-
-  const { writeAsync: approveContractTx, data: dataApproveLetter } =
-    useContractWrite(approveContractConfig);
-
-  const { writeAsync: createNewsLetterContractTx, data: dataCreateNewsLetter } =
-    useContractWrite(createNewsLetterContractConfig);
-
-  const { isSuccess: isSuccessApprove, isLoading: isLoadingApprove } =
-    useWaitForTransaction({
-      hash: dataApproveLetter?.hash,
-    });
-
-  const { isSuccess: isSuccessCreate, isLoading: isLoadingCreate } =
-    useWaitForTransaction({
-      hash: dataCreateNewsLetter?.hash,
-    });
 
   const { isLoading: isLoadingApproveSafe } = useWaitForTransaction({
     hash: hashApproveSafe,
@@ -109,6 +76,7 @@ export default function NewNewsLetterForm({
               web3AuthModalPack?.getProvider()!
             );
             const signer = provider.getSigner();
+            console.log(signer);
             const erc20Contract = new ethers.Contract(
               usdcfake,
               abi.usdcFake,
@@ -131,7 +99,30 @@ export default function NewNewsLetterForm({
       }
     } else {
       try {
-        await approveContractTx?.();
+        const provider = await detectEthereumProvider();
+        const accounts = await window.ethereum.request({
+          method: "eth_requestAccounts",
+        });
+        const signer = new ethers.providers.Web3Provider(
+          window.ethereum
+        ).getSigner(accounts[0]);
+
+        const erc20Contract = new ethers.Contract(
+          usdcfake,
+          abi.usdcFake,
+          signer
+        );
+        console.log(erc20Contract);
+        const tx = await erc20Contract.approve(
+          lockAddress,
+          ethers.utils.parseEther(price.toString()).toString()
+        );
+        setHashApproveSafe(tx.hash);
+        const txReceiptStatus = await waitForTransactionReceipt(
+          provider,
+          tx.hash
+        );
+        txReceiptStatus === 1 && setApproveSafeStatus(true);
       } catch (error) {
         console.log(error);
       }
@@ -172,7 +163,30 @@ export default function NewNewsLetterForm({
       }
     } else {
       try {
-        await createNewsLetterContractTx?.();
+        const provider = await detectEthereumProvider();
+        const accounts = await window.ethereum.request({
+          method: "eth_requestAccounts",
+        });
+        const signer = new ethers.providers.Web3Provider(
+          window.ethereum
+        ).getSigner(accounts[0]);
+        const erc20Contract = new ethers.Contract(
+          lockAddress,
+          abi.subsblockAbi,
+          signer
+        );
+        const tx = await erc20Contract.addNewsletter(
+          ipfsLink,
+          title,
+          description,
+          price
+        );
+        setHashCreateSafe(tx.hash);
+        const txReceiptStatus = await waitForTransactionReceipt(
+          provider,
+          tx.hash
+        );
+        txReceiptStatus === 1 && setCreateSafeStatus(true);
       } catch (error) {
         console.log(error);
       }
@@ -236,8 +250,8 @@ export default function NewNewsLetterForm({
   }, []);
 
   useEffect(() => {
-    getSuccess(isSuccessCreate);
-  }, [isSuccessCreate, approveSafeStatus]);
+    getSuccess(approveSafeStatus);
+  }, [approveSafeStatus]);
 
   async function handleImageUpload(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -328,8 +342,8 @@ export default function NewNewsLetterForm({
           className=" px-4 block w-full border-black rounded-lg  my-4 border-2 py-1.5 text-gray-900  placeholder:text-gray-400 sm:text-sm sm:leading-6"
         />
       </div>
-      {isSuccessApprove || approveSafeStatus ? (
-        isLoadingCreate || (isLoadingCreateSafe && !createSafeStatus) ? (
+      {approveSafeStatus ? (
+        isLoadingCreateSafe && !createSafeStatus ? (
           <button className="px-10 py-2 bg-main rounded-lg flex mx-auto text-lightText">
             Creating
           </button>
@@ -341,7 +355,7 @@ export default function NewNewsLetterForm({
             Create!
           </button>
         )
-      ) : isLoadingApprove || (isLoadingApproveSafe && !approveSafeStatus) ? (
+      ) : isLoadingApproveSafe && !approveSafeStatus ? (
         <button className="px-10 py-2 bg-main rounded-lg flex mx-auto text-lightText">
           Approving
         </button>

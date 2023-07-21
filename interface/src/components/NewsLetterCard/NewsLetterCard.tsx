@@ -23,9 +23,8 @@ function NewsLetterCard({
       key={title}
       className="cardStakingHover flex flex-col items-start justify-between z-10"
     >
-      {" "}
       <Link href={`/${title}`}>
-        <div className="relative w-full">
+        <div className="relative w-full max-h-[100px">
           <ImageIpfsDisplay cid={image} />
           <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-gray-900/10" />
         </div>
