@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 .cardStakingHover:hover {
 	box-shadow: 0 0 40px rgba(236, 96, 42, 0.75);
   }

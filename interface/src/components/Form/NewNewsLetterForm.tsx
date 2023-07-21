@@ -276,7 +276,7 @@ export default function NewNewsLetterForm({
   return (
     <div>
       <div>
-        <label>Title:</label>
+        <label className="text-lg text-lightText">Title:</label>
         <input
           value={title}
           onChange={(e) => handleValue("title", e.target.value)}
@@ -287,7 +287,7 @@ export default function NewNewsLetterForm({
         />
       </div>
       <div>
-        <label>Description:</label>
+        <label className="text-lg text-lightText">Description:</label>
         <textarea
           value={description}
           onChange={(e) => handleValue("description", e.target.value)}
@@ -297,7 +297,7 @@ export default function NewNewsLetterForm({
         />
       </div>
       <div>
-        <label>Image:</label>
+        <label className="text-lg text-lightText">Image:</label>
         <input
           type="file"
           onChange={handleImageUpload}
@@ -308,7 +308,7 @@ export default function NewNewsLetterForm({
         />
       </div>
       <div>
-        <label>Price:</label>
+        <label className="text-lg text-lightText">Price:</label>
         <input
           value={price}
           onChange={(e) => handleValue("price", e.target.value)}
@@ -325,29 +325,29 @@ export default function NewNewsLetterForm({
           type="number"
           name="price"
           id="price"
-          className="px-4 block w-full border-black rounded-lg  my-4 border-2 py-1.5 text-gray-900  placeholder:text-gray-400 sm:text-sm sm:leading-6"
+          className=" px-4 block w-full border-black rounded-lg  my-4 border-2 py-1.5 text-gray-900  placeholder:text-gray-400 sm:text-sm sm:leading-6"
         />
       </div>
       {isSuccessApprove || approveSafeStatus ? (
         isLoadingCreate || (isLoadingCreateSafe && !createSafeStatus) ? (
-          <button className="px-10 py-2 bg-main rounded-lg flex mx-auto">
+          <button className="px-10 py-2 bg-main rounded-lg flex mx-auto text-lightText">
             Creating
           </button>
         ) : (
           <button
-            className="px-10 py-2 bg-main rounded-lg flex mx-auto"
+            className="px-10 py-2 bg-main rounded-lg flex mx-auto text-lightText"
             onClick={() => onCreateNewsLetterClick()}
           >
             Create!
           </button>
         )
       ) : isLoadingApprove || (isLoadingApproveSafe && !approveSafeStatus) ? (
-        <button className="px-10 py-2 bg-main rounded-lg flex mx-auto">
+        <button className="px-10 py-2 bg-main rounded-lg flex mx-auto text-lightText">
           Approving
         </button>
       ) : (
         <button
-          className="px-10 py-2 bg-main rounded-lg flex mx-auto"
+          className="px-10 py-2 bg-main rounded-lg flex mx-auto text-lightText"
           onClick={() => onApporveClick()}
         >
           Approve

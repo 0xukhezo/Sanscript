@@ -5,7 +5,8 @@ export const newsLettersTest = [
     newsletterOwner: "0x31AE9D5A302bAEC5A1c5fBeeB8A1308364BeFC80",
     newsletterNonce: 1,
     title: "Newsletter 1",
-    description: "This is newsletter 1",
+    description:
+      "This is newsletter 1 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2",
     pricePerMonth: 1100000000000000000,
     blockNumber: 1000,
     blockTimestamp: 1626342000,
@@ -17,7 +18,8 @@ export const newsLettersTest = [
     newsletterOwner: "0x1234567890abcdef",
     newsletterNonce: 2,
     title: "Newsletter 2",
-    description: "This is newsletter 2",
+    description:
+      "This is newsletter 1 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2",
     pricePerMonth: 1000000000000000000,
     blockNumber: 2000,
     blockTimestamp: 1626343000,
@@ -29,7 +31,8 @@ export const newsLettersTest = [
     newsletterOwner: "0x0987654321fedcba",
     newsletterNonce: 1,
     title: "Newsletter 3",
-    description: "This is newsletter 3",
+    description:
+      "This is newsletter 1 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2",
     pricePerMonth: 1000000000000000000,
     blockNumber: 3000,
     blockTimestamp: 1626344000,
@@ -41,7 +44,8 @@ export const newsLettersTest = [
     newsletterOwner: "0x1234567890abcdef",
     newsletterNonce: 1,
     title: "Newsletter 1",
-    description: "This is newsletter 1",
+    description:
+      "This is newsletter 1 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2",
     pricePerMonth: 1000000000000000000,
     blockNumber: 1000,
     blockTimestamp: 1626342000,
@@ -53,7 +57,8 @@ export const newsLettersTest = [
     newsletterOwner: "0x1234567890abcdef",
     newsletterNonce: 2,
     title: "Newsletter 2",
-    description: "This is newsletter 2",
+    description:
+      "This is newsletter 1 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2",
     pricePerMonth: 1000000000000000000,
     blockNumber: 2000,
     blockTimestamp: 1626343000,
@@ -65,7 +70,8 @@ export const newsLettersTest = [
     newsletterOwner: "0x0987654321fedcba",
     newsletterNonce: 1,
     title: "Newsletter 3",
-    description: "This is newsletter 3",
+    description:
+      "This is newsletter 1 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2",
     pricePerMonth: 1000000000000000000,
     blockNumber: 3000,
     blockTimestamp: 1626344000,
@@ -77,7 +83,8 @@ export const newsLettersTest = [
     newsletterOwner: "0x1234567890abcdef",
     newsletterNonce: 1,
     title: "Newsletter 1",
-    description: "This is newsletter 1",
+    description:
+      "This is newsletter 1 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2",
     pricePerMonth: 1000000000000000000,
     blockNumber: 1000,
     blockTimestamp: 1626342000,
@@ -89,7 +96,8 @@ export const newsLettersTest = [
     newsletterOwner: "0x1234567890abcdef",
     newsletterNonce: 2,
     title: "Newsletter 2",
-    description: "This is newsletter 2",
+    description:
+      "This is newsletter 1 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2",
     pricePerMonth: 1000000000000000000,
     blockNumber: 2000,
     blockTimestamp: 1626343000,
@@ -101,7 +109,8 @@ export const newsLettersTest = [
     newsletterOwner: "0x0987654321fedcba",
     newsletterNonce: 1,
     title: "Newsletter 3",
-    description: "This is newsletter 3",
+    description:
+      "This is newsletter 1 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2 This is newsletter 2",
     pricePerMonth: 1000000000000000000,
     blockNumber: 3000,
     blockTimestamp: 1626344000,

@@ -11,18 +11,21 @@ import { InjectedConnector } from "@wagmi/core";
 import { useConnect } from "wagmi";
 import { AuthKitSignInData, Web3AuthModalPack } from "../../utils";
 
-import Link from "next/link";
 import { BellIcon } from "@heroicons/react/24/outline";
 import { EmbedSDK } from "@pushprotocol/uiembed";
 
 const WEB3AUTH_CLIENT_ID = process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID;
 const INFURA_KEY = process.env.NEXT_PUBLIC_INFURA_KEY;
 
-export default function NavBar() {
+interface NavBarProps {
+  getStatus: (status: boolean) => void;
+}
+
+export default function NavBar({ getStatus }: NavBarProps) {
   const { connect } = useConnect({
     connector: new InjectedConnector(),
   });
-
+  const [eoa, setEoa] = useState<string>("");
   const [loginClick, setLoginClick] = useState<boolean>(false);
   const [address, setAddress] = useState<string>("");
   const [web3AuthModalPack, setWeb3AuthModalPack] =
@@ -42,6 +45,7 @@ export default function NavBar() {
     connect();
     setAddress(signInInfo.eoa);
     setSafeAuthSignInResponse(signInInfo);
+    getStatus(true);
     setProvider(web3AuthModalPack.getProvider() as SafeEventEmitterProvider);
   };
 
@@ -49,7 +53,8 @@ export default function NavBar() {
     if (!web3AuthModalPack) return;
 
     await web3AuthModalPack.signOut();
-
+    localStorage.removeItem("eoa");
+    getStatus(false);
     setProvider(null);
     setSafeAuthSignInResponse(null);
   };
@@ -122,7 +127,7 @@ export default function NavBar() {
           unreadIndicatorColor: "#cc1919",
           unreadIndicatorPosition: "bottom-right",
         },
-        theme: "light",
+        theme: "dark",
         onOpen: () => {
           console.log("-> client dApp onOpen callback");
         },
@@ -145,11 +150,18 @@ export default function NavBar() {
     }
   }, [web3AuthModalPack]);
 
+  useEffect(() => {
+    setEoa(localStorage.getItem("eoa") as string);
+  }, []);
+
+  useEffect(() => {
+    setEoa(localStorage.getItem("eoa") as string);
+  }, [eoa]);
+
   return (
-    <main className="flex justify-between px-20 py-6 bg-darkBackground items-center text-darkText">
-      <Link href="/">SanScript</Link>
+    <main className="flex justify-end py-6 mx-6 items-center text-darkText bg-darkBackground z-50">
       <div>
-        {!!provider && safeAuthSignInResponse?.eoa ? (
+        {eoa || safeAuthSignInResponse?.eoa ? (
           <div className="flex justify-between items-center">
             <div className="flex items-center">
               <button id="sdk-trigger-id">
@@ -157,7 +169,7 @@ export default function NavBar() {
               </button>
             </div>
             <div className="px-4">
-              <EthHashInfo address={safeAuthSignInResponse.eoa} />
+              <EthHashInfo address={safeAuthSignInResponse?.eoa || eoa} />
             </div>
             <button onClick={logout} className="px-4 py-2 bg-main rounded-lg">
               Log Out

@@ -42,13 +42,12 @@ export default function ImageDisplay({ cid }: ImageDisplayProps) {
   }, [cid]);
 
   return (
-    <div>
+    <div className=" w-full rounded-2xl bg-gray-100 object-cover z-10">
       {imageSrc ? (
         <Image
-          className="mx-auto"
           src={imageSrc}
           height={10}
-          width={400}
+          width={600}
           alt="Newsletter Image"
         ></Image>
       ) : (
