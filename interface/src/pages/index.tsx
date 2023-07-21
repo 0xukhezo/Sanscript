@@ -23,23 +23,23 @@ const mediumImgDark = { MediumDark };
 const iconsFooterDark = [
   {
     img: twitterImgDark.TwitterDark.src,
-    href: "https://twitter.com/DragonStake",
+    href: "",
   },
   {
     img: githubImgDark.GithubDark.src,
-    href: "https://github.com/dragonstake",
+    href: "",
   },
   {
     img: lensImgDark.LensDark.src,
-    href: "https://lenster.xyz/u/dragonstake",
+    href: "",
   },
   {
     img: telegramImgDark.TelegramDark.src,
-    href: "https://t.me/DragonStake_Community",
+    href: "",
   },
   {
     img: mediumImgDark.MediumDark.src,
-    href: "https://medium.com/@dragonstake",
+    href: "",
   },
 ];
 
