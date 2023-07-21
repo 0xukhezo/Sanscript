@@ -110,6 +110,35 @@ export default function NavBar() {
 
   useEffect(() => {
     if (web3AuthModalPack && web3AuthModalPack.getProvider() && loginClick) {
+      EmbedSDK.init({
+        headerText: "Notifications",
+        targetID: "sdk-trigger-id",
+        appName: "consumerApp",
+        user: address,
+        chainId: 5,
+        viewOptions: {
+          type: "sidebar",
+          showUnreadIndicator: true,
+          unreadIndicatorColor: "#cc1919",
+          unreadIndicatorPosition: "bottom-right",
+        },
+        theme: "light",
+        onOpen: () => {
+          console.log("-> client dApp onOpen callback");
+        },
+        onClose: () => {
+          console.log("-> client dApp onClose callback");
+        },
+      });
+
+      return () => {
+        EmbedSDK.cleanup();
+      };
+    }
+  });
+
+  useEffect(() => {
+    if (web3AuthModalPack && web3AuthModalPack.getProvider() && loginClick) {
       (async () => {
         await login();
       })();
@@ -118,10 +147,15 @@ export default function NavBar() {
 
   return (
     <main className="flex justify-between px-20 py-6 bg-darkBackground items-center text-darkText">
-      <Link href="/">ETH Paris</Link>
+      <Link href="/">SanScript</Link>
       <div>
         {!!provider && safeAuthSignInResponse?.eoa ? (
           <div className="flex justify-between items-center">
+            <div className="flex items-center">
+              <button id="sdk-trigger-id">
+                <BellIcon className="h-6 w-6 text-main" aria-hidden="true" />
+              </button>
+            </div>
             <div className="px-4">
               <EthHashInfo address={safeAuthSignInResponse.eoa} />
             </div>
