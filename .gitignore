@@ -1,2 +1,17 @@
+#api
 api/node_modules
 api/.env
+
+#core
+core/node_modules
+core/.env
+core/coverage
+core/coverage.json
+core/typechain
+core/typechain-types
+
+# Hardhat files
+cache
+artifacts
+
+#subgraph
