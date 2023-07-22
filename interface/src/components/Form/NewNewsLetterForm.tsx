@@ -28,7 +28,7 @@ export default function NewNewsLetterForm({
   const [conexionType, setConexionType] = useState<string | null>("");
   const [web3AuthModalPack, setWeb3AuthModalPack] =
     useState<Web3AuthModalPack>();
-
+  const [hasProvider, setHasProvider] = useState<boolean | null>(null);
   const [hashApproveSafe, setHashApproveSafe] = useState<
     `0x${string}` | undefined
   >();
@@ -49,21 +49,49 @@ export default function NewNewsLetterForm({
     hash: hashCreateSafe,
   });
 
-  async function waitForTransactionReceipt(provider: any, txHash: any) {
+  async function waitForTransactionReceipt(txHash?: any, provider?: any) {
     let txReceipt = null;
 
-    while (!txReceipt) {
-      try {
-        txReceipt = await provider.getTransactionReceipt(txHash);
-        if (!txReceipt) {
-          await new Promise((resolve) => setTimeout(resolve, 10000));
-        } else {
-          console.log(txReceipt);
-          return txReceipt.status;
+    if (conexionType !== "openlogin") {
+      let maxAttempts = 20;
+
+      while (!txReceipt) {
+        try {
+          for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+            const txReceipt = await window.ethereum.request({
+              method: "eth_getTransactionReceipt",
+              params: [txHash],
+            });
+            if (txReceipt) {
+              console.log(txReceipt);
+              return txReceipt.status === "0x1";
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, 10000));
+          }
+
+          console.log(
+            `La transacción con hash "${txHash}" no pudo encontrarse después de ${maxAttempts} intentos.`
+          );
+          return false;
+        } catch (error) {
+          console.error("Error obtaining the tx receipt", error);
+          return false;
         }
-      } catch (error) {
-        console.error("Error obtaining the tx receipt", error);
-        break;
+      }
+    } else {
+      while (!txReceipt) {
+        try {
+          txReceipt = await provider.getTransactionReceipt(txHash);
+          if (!txReceipt) {
+            await new Promise((resolve) => setTimeout(resolve, 10000));
+          } else {
+            return txReceipt.status;
+          }
+        } catch (error) {
+          console.error("Error obtaining the tx receipt", error);
+          break;
+        }
       }
     }
   }
@@ -88,8 +116,8 @@ export default function NewNewsLetterForm({
             );
             setHashApproveSafe(tx.hash);
             const txReceiptStatus = await waitForTransactionReceipt(
-              provider,
-              tx.hash
+              tx.hash,
+              provider
             );
             txReceiptStatus === 1 && setApproveSafeStatus(true);
           } catch (error) {
@@ -99,30 +127,28 @@ export default function NewNewsLetterForm({
       }
     } else {
       try {
-        const provider = await detectEthereumProvider();
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts",
-        });
-        const signer = new ethers.providers.Web3Provider(
-          window.ethereum
-        ).getSigner(accounts[0]);
+        if (hasProvider) {
+          const accounts = await window.ethereum.request({
+            method: "eth_requestAccounts",
+          });
+          const signer = new ethers.providers.Web3Provider(
+            window.ethereum
+          ).getSigner(accounts[0]);
 
-        const erc20Contract = new ethers.Contract(
-          usdcfake,
-          abi.usdcFake,
-          signer
-        );
+          const erc20Contract = new ethers.Contract(
+            usdcfake,
+            abi.usdcFake,
+            signer
+          );
 
-        const tx = await erc20Contract.approve(
-          lockAddress,
-          ethers.utils.parseEther(price.toString()).toString()
-        );
-        setHashApproveSafe(tx.hash);
-        const txReceiptStatus = await waitForTransactionReceipt(
-          provider,
-          tx.hash
-        );
-        txReceiptStatus === 1 && setApproveSafeStatus(true);
+          const tx = await erc20Contract.approve(
+            lockAddress,
+            ethers.utils.parseEther(price.toString()).toString()
+          );
+          setHashApproveSafe(tx.hash);
+          const txReceiptStatus = await waitForTransactionReceipt(tx.hash);
+          txReceiptStatus && setApproveSafeStatus(true);
+        }
       } catch (error) {
         console.log(error);
       }
@@ -152,10 +178,11 @@ export default function NewNewsLetterForm({
 
             setHashCreateSafe(tx.hash);
             const txReceiptStatus = await waitForTransactionReceipt(
-              provider,
-              tx.hash
+              tx.hash,
+              provider
             );
             txReceiptStatus === 1 && setCreateSafeStatus(true);
+            getSuccess(true);
           } catch (error) {
             console.error("Error:", error);
           }
@@ -163,30 +190,30 @@ export default function NewNewsLetterForm({
       }
     } else {
       try {
-        const provider = await detectEthereumProvider();
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts",
-        });
-        const signer = new ethers.providers.Web3Provider(
-          window.ethereum
-        ).getSigner(accounts[0]);
-        const erc20Contract = new ethers.Contract(
-          lockAddress,
-          abi.subsblockAbi,
-          signer
-        );
-        const tx = await erc20Contract.addNewsletter(
-          ipfsLink,
-          title,
-          description,
-          price
-        );
-        setHashCreateSafe(tx.hash);
-        const txReceiptStatus = await waitForTransactionReceipt(
-          provider,
-          tx.hash
-        );
-        txReceiptStatus === 1 && setCreateSafeStatus(true);
+        if (hasProvider) {
+          const accounts = await window.ethereum.request({
+            method: "eth_requestAccounts",
+          });
+          const signer = new ethers.providers.Web3Provider(
+            window.ethereum
+          ).getSigner(accounts[0]);
+          const erc20Contract = new ethers.Contract(
+            lockAddress,
+            abi.subsblockAbi,
+            signer
+          );
+          const tx = await erc20Contract.addNewsletter(
+            ipfsLink,
+            title,
+            description,
+            price
+          );
+          setHashCreateSafe(tx.hash);
+
+          const txReceiptStatus = await waitForTransactionReceipt(tx.hash);
+          txReceiptStatus && setCreateSafeStatus(true);
+          getSuccess(true);
+        }
       } catch (error) {
         console.log(error);
       }
@@ -195,8 +222,6 @@ export default function NewNewsLetterForm({
 
   useEffect(() => {
     (async () => {
-      const provider = await detectEthereumProvider();
-      console.log(provider);
       const type = localStorage.getItem("Web3Auth-cachedAdapter");
       setConexionType(type);
       const options: Web3AuthOptions = {
@@ -252,8 +277,13 @@ export default function NewNewsLetterForm({
   }, []);
 
   useEffect(() => {
-    getSuccess(isLoadingCreateSafe);
-  }, [approveSafeStatus, createSafeStatus]);
+    const getProvider = async () => {
+      const provider = await detectEthereumProvider({ silent: true });
+      setHasProvider(Boolean(provider));
+    };
+
+    getProvider();
+  }, []);
 
   async function handleImageUpload(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
