@@ -2,6 +2,7 @@ type Owner @entity {
   id: ID!
   newsletters: [Newsletter!] @derivedFrom(field: "newsletterOwner")
   newslettersAmount: BigInt!
+  isVerifiedHuman: Boolean!
 }
 
 type Newsletter @entity {

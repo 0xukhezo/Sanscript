@@ -31,11 +31,12 @@ async function generateAttestation(
 
   eas.connect(wallet);
 
-  const schemaEncoder = new SchemaEncoder("address a, uint256 b");
-  const encodedData = schemaEncoder.encodeData([
-    { name: "a", value: newsletterOwner, type: "address" },
-    { name: "b", value: nonce, type: "uint256" },
-  ]);
+    const schemaEncoder = new SchemaEncoder("address newsletterOwner, uint8 newsletterNonce");
+    const encodedData = schemaEncoder.encodeData([
+        { name: "newsletterOwner", value: ethers.utils.getAddress(newsletterOwner), type: "address" },
+        { name: "newsletterNonce", value: nonce, type: "uint8" },
+    ]);
+
 
   const tx = await eas.attest({
     schema: process.env.SCHEMA_UID!,
@@ -111,11 +112,11 @@ function fillSchemaJsonDecode(
   newsletterOwner: string,
   newsletterNonce: string
 ) {
-  const nonceHexa = `0x${parseInt(newsletterNonce, 10)
-    .toString(16)
-    .padStart(2, "0")}`;
 
-  return `[{\"name\":\"a\",\"type\":\"address\",\"signature\":\"address a\",\"value\":{\"name\":\"a\",\"type\":\"address\",\"value\":\"${newsletterOwner}\"}},{\"name\":\"b\",\"type\":\"uint256\",\"signature\":\"uint256 b\",\"value\":{\"name\":\"b\",\"type\":\"uint256\",\"value\":{\"type\":\"BigNumber\",\"hex\":\"${nonceHexa}\"}}}]`;
+    const nonceHexa = `0x${parseInt(newsletterNonce, 10).toString(16).padStart(2, "0")}`
+    console.log(nonceHexa)
+    return `[{\"name\":\"a\",\"type\":\"address\",\"signature\":\"address a\",\"value\":{\"name\":\"a\",\"type\":\"address\",\"value\":\"${newsletterOwner}\"}},{\"name\":\"b\",\"type\":\"uint256\",\"signature\":\"uint256 b\",\"value\":{\"name\":\"b\",\"type\":\"uint256\",\"value\":{\"type\":\"BigNumber\",\"hex\":\"${nonceHexa}\"}}}]`
+
 }
 
 async function getMyNewslettersSubscription(address: string) {
