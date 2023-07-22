@@ -13,6 +13,7 @@ import { AuthKitSignInData, Web3AuthModalPack } from "../../utils";
 
 import { BellIcon } from "@heroicons/react/24/outline";
 import { EmbedSDK } from "@pushprotocol/uiembed";
+import { useRouter } from "next/router";
 
 const WEB3AUTH_CLIENT_ID = process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID;
 const INFURA_KEY = process.env.NEXT_PUBLIC_INFURA_KEY;
@@ -25,6 +26,7 @@ export default function NavBar({ getStatus }: NavBarProps) {
   const { connect } = useConnect({
     connector: new InjectedConnector(),
   });
+  const router = useRouter();
   const [eoa, setEoa] = useState<string>("");
   const [loginClick, setLoginClick] = useState<boolean>(false);
   const [address, setAddress] = useState<string>("");
@@ -159,7 +161,13 @@ export default function NavBar({ getStatus }: NavBarProps) {
   }, [eoa]);
 
   return (
-    <main className="flex justify-end py-6 mx-6 items-center text-darkText bg-darkBackground z-50">
+    <main
+      className={
+        router.pathname === "/"
+          ? "flex justify-end pt-6 pb-3 px-6 items-center text-darkText bg-darkBackground z-50 rounded-xl"
+          : "flex justify-end pt-6 pb-3 px-6 items-center text-darkText bg-darkBackground"
+      }
+    >
       <div>
         {eoa || safeAuthSignInResponse?.eoa ? (
           <div className="flex justify-between items-center">
@@ -171,14 +179,17 @@ export default function NavBar({ getStatus }: NavBarProps) {
             <div className="px-4">
               <EthHashInfo address={safeAuthSignInResponse?.eoa || eoa} />
             </div>
-            <button onClick={logout} className="px-4 py-2 bg-main rounded-lg">
+            <button onClick={logout} className="px-4 py-2 bg-main rounded-full">
               Log Out
             </button>
           </div>
         ) : (
           <div className="flex items-center">
-            <button onClick={login} className="px-4 py-2 bg-main rounded-lg">
-              Login
+            <button
+              onClick={login}
+              className="px-4 py-2 bg-darkText rounded-full text-lightText"
+            >
+              Connect to App
             </button>
           </div>
         )}

@@ -2,44 +2,37 @@ import NavBar from "@/components/Layout/NavBar";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useAccount } from "wagmi";
 import Displayer from "../components/Displayer/Displayer";
-import { newsLettersTest } from "../testNewLetter/testNewLetter";
 import { client, NewsLetters } from "./api/Newsletters";
 import { HomeIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import CreateNewsLetterModal from "@/components/Modal/CreateNewsLetterModal";
 import MediumDark from "../../public/MediumDark.svg";
 import GithubDark from "../../public/GithubDark.svg";
 import LensDark from "../../public/LensDark.svg";
-import TelegramDark from "../../public/TelegramDark.svg";
 import TwitterDark from "../../public/TwitterDark.svg";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 const twitterImgDark = { TwitterDark };
 const githubImgDark = { GithubDark };
 const lensImgDark = { LensDark };
-const telegramImgDark = { TelegramDark };
 const mediumImgDark = { MediumDark };
 
 const iconsFooterDark = [
   {
     img: twitterImgDark.TwitterDark.src,
-    href: "https://twitter.com/DragonStake",
+    href: "",
   },
   {
     img: githubImgDark.GithubDark.src,
-    href: "https://github.com/dragonstake",
+    href: "",
   },
   {
     img: lensImgDark.LensDark.src,
-    href: "https://lenster.xyz/u/dragonstake",
-  },
-  {
-    img: telegramImgDark.TelegramDark.src,
-    href: "https://t.me/DragonStake_Community",
+    href: "",
   },
   {
     img: mediumImgDark.MediumDark.src,
-    href: "https://medium.com/@dragonstake",
+    href: "",
   },
 ];
 
@@ -49,7 +42,6 @@ type Icon = {
 };
 
 export default function Home() {
-  const { address } = useAccount();
   const [newsLetters, setNewsLetters] = useState<Object[]>([]);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [status, setStatus] = useState<boolean>(false);
@@ -61,29 +53,29 @@ export default function Home() {
 
   async function fetchNewsLetters() {
     const queryBody = `query {
-      AddedNewsletter {
-            id,
-            image,
-            newsletterOwner,
-            newsletterNonce,
-            title,
-            description,
-            pricePerMonth,
-            blockNumber,
-            blockTimestamp,
-            transactionHash
+      newsletters {
+        id
+        image
+        description
+        newsletterOwner {
+          id
+        }
+        pricePerMonth
+        title
         }
       }`;
 
     try {
       let response = await client.query({ query: NewsLetters(queryBody) });
-      setNewsLetters(response.data.AddedNewsletter);
-      // setNewsLettersOwned(
-      //   newsLettersTest.filter((newsLetter: any) => {
-      //     console.log(newsLetter.newsletterOwner);
-      //     newsLetter.newsletterOwner === address;
-      //   })
-      // );
+      setNewsLetters(response.data.newsletters);
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      setNewsLettersOwned(
+        response.data.newsletters.filter((newsLetter: any) => {
+          return newsLetter.newsletterOwner.id === accounts[0].toLowerCase();
+        })
+      );
     } catch (err) {
       console.log({ err });
     }
@@ -97,52 +89,43 @@ export default function Home() {
     setStatus(statusNavbar);
   };
 
-  useEffect(() => {
-    setEoa(localStorage.getItem("eoa") as string);
+  const getFilteres = () => {
     const eoa = localStorage.getItem("eoa") as string;
-
-    const filteredOwnedNewsLetters = newsLettersTest.filter(
-      (newsLetter: any) => newsLetter.newsletterOwner === eoa
+    const filteredOwnedNewsLetters = newsLetters.filter(
+      (newsLetter: any) => newsLetter.newsletterOwner.id === eoa
     );
 
-    const filteredOtherNewsLetters = newsLettersTest.filter(
-      (newsLetter: any) => newsLetter.newsletterOwner !== eoa
+    const filteredOtherNewsLetters = newsLetters.filter(
+      (newsLetter: any) => newsLetter.newsletterOwner.id !== eoa
     );
 
     setNewsLettersOwned(filteredOwnedNewsLetters);
     setNewsLetters(filteredOtherNewsLetters);
+    setNewsLettersOwned(
+      newsLetters.filter((newsLetter: any) => {
+        return newsLetter.newsletterOwner.id === eoa.toLowerCase();
+      })
+    );
+  };
+
+  useEffect(() => {
+    setEoa(localStorage.getItem("eoa") as string);
+    fetchNewsLetters();
+    getFilteres();
   }, []);
 
   useEffect(() => {
-    const filteredOwnedNewsLetters = newsLettersTest.filter(
-      (newsLetter: any) => newsLetter.newsletterOwner === eoa
-    );
-
-    const filteredOtherNewsLetters = newsLettersTest.filter(
-      (newsLetter: any) => newsLetter.newsletterOwner !== eoa
-    );
-
-    setNewsLettersOwned(filteredOwnedNewsLetters);
-    setNewsLetters(filteredOtherNewsLetters);
-  }, [eoa]);
+    getFilteres();
+  }, [eoa, status]);
 
   useEffect(() => {
-    const filteredOwnedNewsLetters = newsLettersTest.filter(
-      (newsLetter: any) => newsLetter.newsletterOwner === eoa
-    );
-
-    const filteredOtherNewsLetters = newsLettersTest.filter(
-      (newsLetter: any) => newsLetter.newsletterOwner !== eoa
-    );
-
-    setNewsLettersOwned(filteredOwnedNewsLetters);
-    setNewsLetters(filteredOtherNewsLetters);
-  }, [address]);
-
-  useEffect(() => {
-    setEoa(localStorage.getItem("eoa") as string);
+    if (status) {
+      setEoa(localStorage.getItem("eoa") as string);
+    } else {
+      setEoa(localStorage.getItem("eoa") as string);
+    }
   }, [status]);
-  console.log(eoa, newsLettersOwned);
+
   return (
     <main className="grid lg:grid-cols-4 lg:max-w-[1668px]">
       <section className="lg:max-w-[520px] col-span-1 mx-4 mt-4">
@@ -171,7 +154,7 @@ export default function Home() {
             </div>{" "}
           </div>
         </div>
-        <div className="flex flex-col px-2 rounded-xl bg-darkBackground  h-[735px] mt-4">
+        <div className="flex flex-col px-2 rounded-xl bg-darkBackground  h-[735px] mt-4 justify-between">
           {newsLettersOwned?.length !== 0 && newsLettersOwned ? (
             <section className="my-6">
               <div className="flex items-center justify-between bg-grayStakingLinkHover p-4 rounded-xl">
@@ -180,15 +163,13 @@ export default function Home() {
                   +
                 </button>
               </div>
-              <div className="my-4 bg-grayStakingLinkHover p-4 rounded-xl">
+              <div>
                 {newsLettersOwned?.map((newLetter: any, index: number) => {
                   return (
-                    <Link
-                      href={`/${newLetter.title}`}
-                      className="text-2xl"
-                      key={index}
-                    >
-                      <div>{newLetter.title}</div>
+                    <Link href={`/${newLetter.title}`} key={index}>
+                      <div className="cardStakingHover my-4 bg-grayStakingLinkHover p-4 rounded-xl text-2xl">
+                        {newLetter.title}
+                      </div>
                     </Link>
                   );
                 })}
@@ -198,7 +179,14 @@ export default function Home() {
             <section className="my-6 bg-grayStakingLinkHover p-4 rounded-xl">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl">Your Newsletters</h2>
-                {eoa !== null && <button className="text-4xl">+</button>}
+                {eoa !== null && (
+                  <button
+                    className="text-4xl"
+                    onClick={() => setOpenModal(true)}
+                  >
+                    +
+                  </button>
+                )}
               </div>
               <div className="flex justify-center mt-4 flex-col text-center">
                 {eoa !== null ? (
@@ -213,14 +201,50 @@ export default function Home() {
               </div>
             </section>
           )}
+          <div className="m-4">
+            <div className="flex flex-row items-center">
+              <div className="mb-3 p-2 rounded-full border-1 border-white w-fit flex items-center">
+                <ChevronDownIcon
+                  className="h-4 w-4 text-white"
+                  aria-hidden="true"
+                />
+                <span className="ml-2">Spanish</span>
+              </div>
+              <div className="font-light text-sm mb-2 ml-2">
+                <span className="mx-2">The team</span>
+                <span className="mx-2">Github</span>
+                <span className="mx-2">Join Discord</span>
+              </div>
+            </div>
+            <div className="my-4 flex justify-between">
+              <div className="font-light text-sm">
+                Developed on ETH Global Paris
+              </div>
+              <div className="flex flex-row">
+                {iconsFooterDark.map((icon: Icon, index: number) => {
+                  return (
+                    <a href={icon.href} target="_blank" key={index}>
+                      <Image
+                        width={17}
+                        height={17}
+                        alt="Token Image"
+                        src={icon.img}
+                        className="mr-3"
+                      />
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
-      <section className="lg:min-w-[1288px] col-span-3 mx-4 mt-4 bg-darkBackground rounded-xl h-[935px]  relative">
+      <section className="lg:min-w-[1288px] col-span-3 mx-4 mt-4 bg-darkBackground rounded-xl h-[935px] relative">
         <div className="sticky top-0">
           <NavBar getStatus={getStatus} />
         </div>
         <div className="h-[790px] overflow-auto ml-10">
-          {newsLetters && newsLettersSubscribed && newsLettersOwned ? (
+          {newsLetters && newsLettersSubscribed ? (
             <Displayer
               newsLetters={newsLetters}
               newsLettersSubscribed={newsLettersSubscribed}
@@ -228,24 +252,6 @@ export default function Home() {
           ) : (
             <div>Loading...</div>
           )}
-        </div>
-        <div className="mx-20 my-4 flex justify-between">
-          <div className="font-bold">Developed on ETH Global Paris</div>
-          <div className="flex flex-row">
-            {iconsFooterDark.map((icon: Icon, index: number) => {
-              return (
-                <a href={icon.href} target="_blank" key={index}>
-                  <Image
-                    width={24}
-                    height={24}
-                    alt="Token Image"
-                    src={icon.img}
-                    className="mr-9 mb-10 z-10"
-                  />
-                </a>
-              );
-            })}
-          </div>
         </div>
       </section>{" "}
       {openModal && <CreateNewsLetterModal getOpenModal={getOpenModal} />}
