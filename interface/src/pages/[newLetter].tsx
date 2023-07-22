@@ -533,6 +533,7 @@ export default function NewLetter() {
                     conversation={convRef.current}
                     messageHistory={messages}
                     newsLetter={newsLetter}
+                    subscriptors={subscriptors}
                   />{" "}
                 </div>
               )}
