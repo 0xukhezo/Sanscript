@@ -179,7 +179,21 @@ export default function NavBar({ getStatus }: NavBarProps) {
         </Link>
       )}
       <div>
-        {eoa || safeAuthSignInResponse?.eoa ? (
+        {safeAuthSignInResponse?.eoa !== undefined ? (
+          <div className="flex  items-center">
+            <div className="flex items-center">
+              <button id="sdk-trigger-id">
+                <BellIcon className="h-6 w-6 text-main" aria-hidden="true" />
+              </button>
+            </div>
+            <div className="px-4">
+              <EthHashInfo address={safeAuthSignInResponse?.eoa || eoa} />
+            </div>
+            <button onClick={logout} className="px-4 py-2 bg-main rounded-full">
+              Log Out
+            </button>
+          </div>
+        ) : eoa ? (
           <div className="flex  items-center">
             <div className="flex items-center">
               <button id="sdk-trigger-id">

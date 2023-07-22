@@ -10,8 +10,11 @@ import MediumDark from "../../public/MediumDark.svg";
 import GithubDark from "../../public/GithubDark.svg";
 import LensDark from "../../public/LensDark.svg";
 import TwitterDark from "../../public/TwitterDark.svg";
+import Logo1 from "../../public/Logo.svg";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import ImageIpfsDisplay from "@/components/ImageIpfsDisplay/ImageIpfsDisplay";
 
+const Logo = { Logo1 };
 const twitterImgDark = { TwitterDark };
 const githubImgDark = { GithubDark };
 const lensImgDark = { LensDark };
@@ -104,7 +107,7 @@ export default function Home() {
     setNewsLetters(filteredOtherNewsLetters);
     setNewsLettersOwned(
       newsLetters.filter((newsLetter: any) => {
-        return newsLetter.newsletterOwner.id === eoa.toLowerCase();
+        return newsLetter.newsletterOwner.id === eoa?.toLowerCase();
       })
     );
   };
@@ -134,11 +137,13 @@ export default function Home() {
         <div className="flex flex-col justify-between bg-darkBackground h-[184px] rounded-xl">
           <div className="flex flex-col mx-6">
             <Link className="lg:text-lg flex my-4" href="/">
-              <HomeIcon
-                className="h-6 w-6 text-white mr-2"
-                aria-hidden="true"
+              <Image
+                src={Logo.Logo1.src}
+                height={31}
+                width={31}
+                alt="Logo Image"
               />
-              <span>Sanscript</span>
+              <span className="ml-2 text-4xl font-light">Sanscript</span>
             </Link>{" "}
             <Link className="lg:text-lg flex mt-4 mb-6" href="/">
               <HomeIcon
@@ -168,9 +173,9 @@ export default function Home() {
               <div>
                 {newsLettersOwned?.map((newLetter: any, index: number) => {
                   return (
-                    <Link href={`/${newLetter.title}`} key={index}>
-                      <div className="cardStakingHover my-4 bg-grayStakingLinkHover p-4 rounded-xl text-2xl">
-                        {newLetter.title}
+                    <Link href={`/${newLetter.id}`} key={index}>
+                      <div className="cardStakingHover my-4 bg-grayStakingLinkHover p-4 rounded-xl text-2xl flex">
+                        <span>{newLetter.title}</span>
                       </div>
                     </Link>
                   );

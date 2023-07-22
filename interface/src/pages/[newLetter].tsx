@@ -10,7 +10,6 @@ import NavBar from "@/components/Layout/NavBar";
 import { useRouter } from "next/router";
 import {
   ChevronDownIcon,
-  ChevronLeftIcon,
   HomeIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
@@ -21,6 +20,18 @@ import Logo1 from "../../public/Logo.svg";
 import LensDark from "../../public/LensDark.svg";
 import TwitterDark from "../../public/TwitterDark.svg";
 import CreateNewsLetterModal from "@/components/Modal/CreateNewsLetterModal";
+
+import { abi } from "@/abis/abis";
+import detectEthereumProvider from "@metamask/detect-provider";
+import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
+import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
+import { Web3AuthOptions } from "@web3auth/modal";
+
+import { Web3AuthModalPack } from "../utils";
+import axios from "axios";
+
+const WEB3AUTH_CLIENT_ID = process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID;
+const INFURA_KEY = process.env.NEXT_PUBLIC_INFURA_KEY;
 
 const Logo = { Logo1 };
 const twitterImgDark = { TwitterDark };
@@ -53,82 +64,94 @@ type Icon = {
 };
 
 export default function NewLetter() {
-  const [eoa, setEoa] = useState<string>("");
+  const [eoa, setEoa] = useState<string>(null);
   const [newsLetter, setNewsLetter] = useState<any>();
   const [subscriptors, setSubscriptors] = useState<any>();
   const [newsLettersOwned, setNewsLettersOwned] = useState<Object[]>([]);
   const [conexionType, setConexionType] = useState<string | null>("");
-  const [newsLetterSuscribed, setNewsLetterSuscribed] = useState<Object[]>([]);
+  const [newsLetterSuscribed, setNewsLetterSuscribed] =
+    useState<boolean>(false);
   const [status, setStatus] = useState<boolean>(false);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [messages, setMessages] = useState<any>(null);
+  const [subscribedNewsLettersIds, setSubscribedNewsLettersIds] =
+    useState<any>();
+  const [web3AuthModalPack, setWeb3AuthModalPack] =
+    useState<Web3AuthModalPack>();
+  const [hasProvider, setHasProvider] = useState<boolean | null>(null);
+
   const convRef = useRef<any>(null);
   const clientRef = useRef<any>(null);
   const [signer, setSigner] = useState<any>(null);
   const [isOnNetwork, setIsOnNetwork] = useState<any>(false);
   const router = useRouter();
 
+  const usdcfake = "0xd55c3f5961Ec1ff0eC1741eDa7bc2f5962c3c454";
+  const lockAddress = "0x5726E5Fe247214DC0f1C2a9e590550B00962f87f";
+
   async function fetchNewsletterSuscriptor() {
-    const route = router.query.newLetter as string;
-    const nonce = route?.substring(route?.lastIndexOf("_") + 1);
+    if (router) {
+      const route = router.query.newLetter as string;
+      const nonce = route?.substring(route?.lastIndexOf("_") + 1);
 
-    const apiUrl = `http://localhost:3001/api/v1/newsletter/subscriptors?newsletterOwner=${ethers.utils.getAddress(
-      route?.substring(0, route?.lastIndexOf("_"))
-    )}&newsletterNonce=${nonce}`;
+      const apiUrl = `http://localhost:3001/api/v1/newsletter/subscriptors?newsletterOwner=${ethers.utils.getAddress(
+        route?.substring(0, route?.lastIndexOf("_"))
+      )}&newsletterNonce=${nonce}`;
 
-    try {
-      const response = await fetch(apiUrl);
+      try {
+        const response = await fetch(apiUrl);
 
-      if (!response.ok) {
-        throw new Error("No se pudo obtener la respuesta del servidor.");
+        if (!response.ok) {
+          throw new Error("No se pudo obtener la respuesta del servidor.");
+        }
+
+        const data = await response.json();
+
+        setSubscriptors(data);
+
+        return data;
+      } catch (error) {
+        console.error("Error al obtener los datos:", error);
+        throw error;
       }
-
-      const data = await response.json();
-
-      setSubscriptors(data);
-
-      return data;
-    } catch (error) {
-      console.error("Error al obtener los datos:", error);
-      throw error;
     }
   }
 
   async function fetchNewsletterByAddress() {
-    const accounts = await window.ethereum.request({
-      method: "eth_requestAccounts",
-    });
+    console.log(eoa);
+    if (eoa !== null) {
+      const apiUrl = `http://localhost:3001/api/v1/newsletter/${ethers.utils.getAddress(
+        eoa
+      )}`;
 
-    const apiUrl = `http://localhost:3001/api/v1/newsletter/${ethers.utils.getAddress(
-      accounts[0]
-    )}`;
+      try {
+        const response = await fetch(apiUrl);
 
-    try {
-      const response = await fetch(apiUrl);
+        if (!response.ok) {
+          throw new Error("No se pudo obtener la respuesta del servidor.");
+        }
 
-      if (!response.ok) {
-        throw new Error("No se pudo obtener la respuesta del servidor.");
-      }
+        const data = await response.json();
 
-      const data = await response.json();
+        setSubscribedNewsLettersIds(data);
 
-      const route = router.query.newLetter as string;
+        const route = router.query.newLetter as string;
 
-      const isStringInArray = data.some((obj: any) => {
-        console.log(
-          obj.newsletterOnwer ===
+        const isStringInArray = data.some((obj: any) => {
+          return (
+            obj.newsletterOnwer ===
             ethers.utils.getAddress(
               route?.substring(0, route?.lastIndexOf("_"))
             )
-        );
-        obj.newsletterOnwer ===
-          ethers.utils.getAddress(route?.substring(0, route?.lastIndexOf("_")));
-      });
-      setNewsLetterSuscribed(isStringInArray);
-      return data;
-    } catch (error) {
-      console.error("Error al obtener los datos:", error);
-      throw error;
+          );
+        });
+
+        setNewsLetterSuscribed(isStringInArray);
+        return data;
+      } catch (error) {
+        console.error("Error al obtener los datos:", error);
+        throw error;
+      }
     }
   }
 
@@ -155,6 +178,31 @@ export default function NewLetter() {
       console.log({ err });
     }
   }
+
+  // async function fetchNewsLetterByOwner(query: string) {
+  //   const queryBody = `query {newsletters(
+  //     where: {newsletterOwner_: {id: "${query.toLowerCase()}"}}
+  //   ) {
+  //     id
+  //     image
+  //     description
+  //     newsletterOwner {
+  //       id
+  //     }
+  //     pricePerMonth
+  //     title
+  //     newsletterNonce
+  //     }
+  //   }`;
+
+  //   try {
+  //     let response = await client.query({ query: NewsLetters(queryBody) });
+  //     console.log(response);
+  //     setNewsLetter(response.data.newsletters[0]);
+  //   } catch (err) {
+  //     console.log({ err });
+  //   }
+  // }
 
   async function fetchNewsLetters() {
     const queryBody = `query {
@@ -188,8 +236,7 @@ export default function NewLetter() {
   }
 
   const newConversation = async function (xmtp_client: any, addressTo: any) {
-    console.log(eoa.toLowerCase(), newsLetter.newsletterOwner.id);
-    if (eoa.toLowerCase() !== newsLetter.newsletterOwner.id) {
+    if (eoa?.toLowerCase() !== newsLetter.newsletterOwner.id) {
       addressTo = newsLetter.newsletterOwner.id;
     }
     if (await xmtp_client?.canMessage(addressTo)) {
@@ -214,12 +261,157 @@ export default function NewLetter() {
     clientRef.current = xmtp;
   };
 
+  const getStatus = (statusNavbar: boolean) => {
+    setStatus(statusNavbar);
+  };
+
+  const getOpenModal = (modalClose: boolean) => {
+    setOpenModal(modalClose);
+  };
+
+  async function waitForTransactionReceipt(txHash?: any, provider?: any) {
+    let txReceipt = null;
+
+    if (conexionType !== "openlogin") {
+      let maxAttempts = 20;
+
+      while (!txReceipt) {
+        try {
+          for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+            const txReceipt = await window.ethereum.request({
+              method: "eth_getTransactionReceipt",
+              params: [txHash],
+            });
+            if (txReceipt) {
+              return txReceipt.status === "0x1";
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, 10000));
+          }
+
+          console.log(
+            `La transacción con hash "${txHash}" no pudo encontrarse después de ${maxAttempts} intentos.`
+          );
+          return false;
+        } catch (error) {
+          console.error("Error obtaining the tx receipt", error);
+          return false;
+        }
+      }
+    } else {
+      while (!txReceipt) {
+        try {
+          txReceipt = await provider.getTransactionReceipt(txHash);
+          if (!txReceipt) {
+            await new Promise((resolve) => setTimeout(resolve, 10000));
+          } else {
+            return txReceipt.status;
+          }
+        } catch (error) {
+          console.error("Error obtaining the tx receipt", error);
+          break;
+        }
+      }
+    }
+  }
+
+  // const handlePaymentSuccessful = async () => {
+  //   await axios.post("http://localhost:3001/api/v1/newsletter/subscription", {
+  //     newsletterOwner: ethers.utils.getAddress(newsLetter.newsletterOwner.id),
+  //     newsletterNonce: newsLetter.newsletterNonce,
+  //     recipient: eoa,
+  //   });
+  // };
+
+  const onCreateNewsLetterClick = async () => {
+    if (conexionType === "openlogin") {
+      if (web3AuthModalPack && web3AuthModalPack.getProvider()) {
+        (async () => {
+          try {
+            const provider = new ethers.providers.Web3Provider(
+              web3AuthModalPack?.getProvider()!
+            );
+            const signer = provider.getSigner();
+            const erc20Contract = new ethers.Contract(
+              usdcfake,
+              abi.usdcFake,
+              signer
+            );
+
+            const subsblockAbiContract = new ethers.Contract(
+              lockAddress,
+              abi.subsblockAbi,
+              signer
+            );
+
+            const txApprove = await erc20Contract.approve(
+              lockAddress,
+              newsLetter.pricePerMonth.toString()
+            );
+
+            await waitForTransactionReceipt(txApprove.hash, provider);
+
+            const txSubsblock = await subsblockAbiContract.subscribeNewsletter(
+              ethers.utils.getAddress(newsLetter.newsletterOwner.id),
+              newsLetter.newsletterNonce
+            );
+
+            await waitForTransactionReceipt(txSubsblock.hash, provider);
+            // handlePaymentSuccessful();
+          } catch (error) {
+            console.error("Error:", error);
+          }
+        })();
+      }
+    } else {
+      try {
+        if (hasProvider) {
+          const accounts = await window.ethereum.request({
+            method: "eth_requestAccounts",
+          });
+          const signer = new ethers.providers.Web3Provider(
+            window.ethereum
+          ).getSigner(accounts[0]);
+          const erc20Contract = new ethers.Contract(
+            usdcfake,
+            abi.usdcFake,
+            signer
+          );
+
+          const subsblockAbiContract = new ethers.Contract(
+            lockAddress,
+            abi.subsblockAbi,
+            signer
+          );
+
+          const txApprove = await erc20Contract.approve(
+            lockAddress,
+            newsLetter.pricePerMonth.toString()
+          );
+
+          await waitForTransactionReceipt(txApprove.hash);
+
+          const txSubsblock = await subsblockAbiContract.subscribeNewsletter(
+            ethers.utils.getAddress(newsLetter.newsletterOwner.id),
+            newsLetter.newsletterNonce
+          );
+
+          await waitForTransactionReceipt(txSubsblock.hash);
+          // handlePaymentSuccessful();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   useEffect(() => {
     const type = localStorage.getItem("Web3Auth-cachedAdapter");
     setConexionType(type);
     router !== undefined && fetchNewsLetters();
     router !== undefined && fetchNewsLetter(router.query.newLetter as string);
     setEoa(localStorage.getItem("eoa") as string);
+
     if (typeof window.ethereum !== "undefined") {
       try {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -232,19 +424,77 @@ export default function NewLetter() {
     }
   }, []);
 
-  const getStatus = (statusNavbar: boolean) => {
-    setStatus(statusNavbar);
-  };
+  useEffect(() => {
+    (async () => {
+      const type = localStorage.getItem("Web3Auth-cachedAdapter");
+      setConexionType(type);
+      const options: Web3AuthOptions = {
+        clientId: WEB3AUTH_CLIENT_ID || "",
+        web3AuthNetwork: "testnet",
+        chainConfig: {
+          chainNamespace: CHAIN_NAMESPACES.EIP155,
+          chainId: "0xaa36a7",
+          rpcTarget: `${INFURA_KEY}`,
+        },
+        uiConfig: {
+          theme: "dark",
+          loginMethodsOrder: ["google"],
+        },
+      };
 
-  const getOpenModal = (modalClose: boolean) => {
-    setOpenModal(modalClose);
-  };
+      const modalConfig = {
+        [WALLET_ADAPTERS.TORUS_EVM]: {
+          label: "torus",
+          showOnModal: false,
+        },
+        [WALLET_ADAPTERS.METAMASK]: {
+          label: "Metamask",
+          showOnDesktop: true,
+          showOnMobile: true,
+        },
+      };
+
+      const openloginAdapter = new OpenloginAdapter({
+        loginSettings: {
+          mfaLevel: "mandatory",
+        },
+        adapterSettings: {
+          uxMode: "popup",
+          whiteLabel: {
+            name: "Safe",
+          },
+        },
+      });
+
+      const web3AuthModalPack = new Web3AuthModalPack({
+        txServiceUrl: "https://safe-transaction-goerli.safe.global",
+      });
+
+      await web3AuthModalPack.init({
+        options,
+        adapters: [openloginAdapter],
+        modalConfig,
+      });
+
+      setWeb3AuthModalPack(web3AuthModalPack);
+    })();
+  }, []);
+
+  useEffect(() => {
+    const getProvider = async () => {
+      const provider = await detectEthereumProvider({ silent: true });
+      setHasProvider(Boolean(provider));
+    };
+
+    getProvider();
+  }, []);
 
   useEffect(() => {
     setEoa(localStorage.getItem("eoa") as string);
     fetchNewsLetter(router.query.newLetter as string);
     fetchNewsletterSuscriptor();
-  }, [eoa]);
+    fetchNewsletterByAddress();
+  }, [eoa, router]);
 
   useEffect(() => {
     if (isOnNetwork && convRef.current) {
@@ -268,80 +518,10 @@ export default function NewLetter() {
     setEoa(localStorage.getItem("eoa") as string);
   }, [status]);
 
-  useEffect(() => {
-    setEoa(localStorage.getItem("eoa") as string);
-  }, []);
-
-  useEffect(() => {
-    setEoa(localStorage.getItem("eoa") as string);
-  }, [eoa]);
-
-  const onCreateNewsLetterClick = async () => {
-    if (conexionType === "openlogin") {
-      if (web3AuthModalPack && web3AuthModalPack.getProvider()) {
-        (async () => {
-          try {
-            const provider = new ethers.providers.Web3Provider(
-              web3AuthModalPack?.getProvider()!
-            );
-            const signer = provider.getSigner();
-            const erc20Contract = new ethers.Contract(
-              lockAddress,
-              abi.subsblockAbi,
-              signer
-            );
-            const tx = await erc20Contract.addNewsletter(
-              ipfsLink,
-              title,
-              description,
-              usdcfake,
-              ethers.utils.parseEther(price.toString()).toString()
-            );
-
-            setHashCreateSafe(tx.hash);
-            const txReceiptStatus = await waitForTransactionReceipt(
-              tx.hash,
-              provider
-            );
-            txReceiptStatus === 1 && setCreateSafeStatus(true);
-            getSuccess(true);
-          } catch (error) {
-            console.error("Error:", error);
-          }
-        })();
-      }
-    } else {
-      try {
-        if (hasProvider) {
-          const accounts = await window.ethereum.request({
-            method: "eth_requestAccounts",
-          });
-          const signer = new ethers.providers.Web3Provider(
-            window.ethereum
-          ).getSigner(accounts[0]);
-          const erc20Contract = new ethers.Contract(
-            lockAddress,
-            abi.subsblockAbi,
-            signer
-          );
-          const tx = await erc20Contract.addNewsletter(
-            ipfsLink,
-            title,
-            description,
-            usdcfake,
-            ethers.utils.parseEther(price.toString()).toString()
-          );
-          setHashCreateSafe(tx.hash);
-
-          const txReceiptStatus = await waitForTransactionReceipt(tx.hash);
-          txReceiptStatus && setCreateSafeStatus(true);
-          getSuccess(true);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
+  // useEffect(() => {
+  //   subscribedNewsLettersIds !== undefined &&
+  //     fetchNewsLetterByOwner(subscribedNewsLettersIds[0].newsletterOnwer);
+  // }, [subscribedNewsLettersIds]);
 
   return (
     <>
@@ -389,7 +569,7 @@ export default function NewLetter() {
                 <div>
                   {newsLettersOwned?.map((newLetter: any, index: number) => {
                     return (
-                      <Link href={`/${newLetter.title}`} key={index}>
+                      <Link href={`/${newLetter.id}`} key={index}>
                         <div className="cardStakingHover my-4 bg-grayStakingLinkHover p-4 rounded-xl text-2xl">
                           {newLetter.title}
                         </div>
@@ -476,14 +656,10 @@ export default function NewLetter() {
                 <div className="mx-4">
                   <div className="text-4xl flex flex-row justify-between items-center mt-6">
                     <span>{newsLetter.title}</span>
-                    {/* {console.log(
-                      newsLetter.newsletterOwner.id,
-                      eoa.toLowerCase(),
-                      newsLetterSuscribed
-                    )} */}
                     <div className="flex flex-row items-center">
                       {!isOnNetwork &&
-                        (newsLetter.newsletterOwner.id === eoa.toLowerCase() ? (
+                        (newsLetter.newsletterOwner.id ===
+                        eoa?.toLowerCase() ? (
                           <button
                             onClick={initXmtp}
                             className="px-2 py-2 bg-main rounded-full max-h-[60px] text-sm"
@@ -500,7 +676,7 @@ export default function NewLetter() {
                             </button>
                           )
                         ))}
-                      {newsLetter.newsletterOwner.id !== eoa.toLowerCase() &&
+                      {newsLetter.newsletterOwner.id !== eoa?.toLowerCase() &&
                         !newsLetterSuscribed && (
                           <div className="flex">
                             <button
