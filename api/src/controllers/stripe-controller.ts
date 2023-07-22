@@ -1,41 +1,44 @@
-import { RequestType, ResponseType } from '../server'
-import stripeService from '../services/stripe-service'
+import { RequestType, ResponseType } from "../server";
+import stripeService from "../services/stripe-service";
 
-const HTTP_ERROR_STATUS = 400
+const HTTP_ERROR_STATUS = 400;
 
-async function getStripeClientSecret(request: RequestType, response: ResponseType) {
-  const { walletAddress } = request.body
+async function getStripeClientSecret(
+  request: RequestType,
+  response: ResponseType
+) {
+  const { walletAddress } = request.body;
 
   try {
+    const stripeResponse = await stripeService.getStripeClientSecret(
+      walletAddress
+    );
 
-    console.log(request.body)
-    const stripeResponse = await stripeService.getStripeClientSecret(walletAddress)
-
-    return response.send(stripeResponse)
+    return response.send(stripeResponse);
   } catch (error: any) {
-    response.status(HTTP_ERROR_STATUS)
+    response.status(HTTP_ERROR_STATUS);
 
-    return response.send(error.response.data)
+    return response.send(error.response.data);
   }
 }
 
 async function getStripeSession(request: RequestType, response: ResponseType) {
-  const { sessionId } = request.params
+  const { sessionId } = request.params;
 
   try {
-    const stripeResponse = await stripeService.getStripeSession(sessionId)
+    const stripeResponse = await stripeService.getStripeSession(sessionId);
 
-    return response.send(stripeResponse)
+    return response.send(stripeResponse);
   } catch (error: any) {
-    response.status(HTTP_ERROR_STATUS)
+    response.status(HTTP_ERROR_STATUS);
 
-    return response.send(error.response.data)
+    return response.send(error.response.data);
   }
 }
 
 const stripeController = {
   getStripeClientSecret,
-  getStripeSession
-}
+  getStripeSession,
+};
 
-export default stripeController
+export default stripeController;

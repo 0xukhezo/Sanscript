@@ -24,7 +24,7 @@ export default function NewNewsLetterForm({
   const [ipfsLink, setIpfsLink] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [title, setTitle] = useState<string>("");
-  const [price, setPrice] = useState<number>(10);
+  const [price, setPrice] = useState<number>(10.99);
   const [conexionType, setConexionType] = useState<string | null>("");
   const [web3AuthModalPack, setWeb3AuthModalPack] =
     useState<Web3AuthModalPack>();
