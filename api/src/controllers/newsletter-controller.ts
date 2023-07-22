@@ -66,7 +66,9 @@ async function getMyNewslettersSubscription(request: RequestType, response: Resp
 
     try {
 
-        console.log(request.params)
+        const data = easService.getMyNewslettersSubscription(request.params.address)
+
+        return response.send(data)
 
     }catch(error: any){
         response.status(HTTP_SERVER_ERROR);
