@@ -14,6 +14,7 @@ contract Sanscript is Ownable {
         string image;
         string title;
         string description;
+        address token;
         uint256 pricePerMonth;
     }
 
@@ -28,6 +29,7 @@ contract Sanscript is Ownable {
         string image,
         string title,
         string description,
+        address token,
         uint256 pricePerMonth
     );
 
@@ -80,6 +82,7 @@ contract Sanscript is Ownable {
         string memory image,
         string memory title,
         string memory description,
+        address token,
         uint256 pricePerMonth
     ) external {
         require(
@@ -95,6 +98,7 @@ contract Sanscript is Ownable {
             image,
             title,
             description,
+            token,
             pricePerMonth
         );
         nonces[_msgSender()] = nonce + 1;
@@ -105,6 +109,7 @@ contract Sanscript is Ownable {
             image,
             title,
             description,
+            token,
             pricePerMonth
         );
     }
@@ -140,7 +145,7 @@ contract Sanscript is Ownable {
             "This newsletter does not exist"
         );
 
-        uint256 allowance = USDC.allowance(_msgSender(), address(this));
+        uint256 allowance = IERC20(nwLetter.token).allowance(_msgSender(), address(this));
         require(allowance >= nwLetter.pricePerMonth, "Insufficient allowance");
 
         (, uint256 monthsPay) = SafeMath.tryDiv(
@@ -151,7 +156,7 @@ contract Sanscript is Ownable {
             monthsPay,
             nwLetter.pricePerMonth
         );
-        bool success = USDC.transferFrom(
+        bool success = IERC20(nwLetter.token).transferFrom(
             _msgSender(),
             newsletterOwner,
             amountPay

@@ -113,9 +113,7 @@ function fillSchemaJsonDecode(
   newsletterNonce: string
 ) {
 
-    const nonceHexa = `0x${parseInt(newsletterNonce, 10).toString(16).padStart(2, "0")}`
-    console.log(nonceHexa)
-    return `[{\"name\":\"a\",\"type\":\"address\",\"signature\":\"address a\",\"value\":{\"name\":\"a\",\"type\":\"address\",\"value\":\"${newsletterOwner}\"}},{\"name\":\"b\",\"type\":\"uint256\",\"signature\":\"uint256 b\",\"value\":{\"name\":\"b\",\"type\":\"uint256\",\"value\":{\"type\":\"BigNumber\",\"hex\":\"${nonceHexa}\"}}}]`
+    return `[{\"name\":\"newsletterOwner\",\"type\":\"address\",\"signature\":\"address newsletterOwner\",\"value\":{\"name\":\"newsletterOwner\",\"type\":\"address\",\"value\":\"${newsletterOwner}\"}},{\"name\":\"newsletterNonce\",\"type\":\"uint8\",\"signature\":\"uint8 newsletterNonce\",\"value\":{\"name\":\"newsletterNonce\",\"type\":\"uint8\",\"value\":${newsletterNonce}}}]`
 
 }
 
@@ -154,7 +152,9 @@ async function getMyNewslettersSubscription(address: string) {
     variables
   );
 
-  return data;
+  const dataParsed = parseDataMyNewsletterSubscription(data)
+
+  return dataParsed;
 }
 
 const easService = {
@@ -162,5 +162,27 @@ const easService = {
   getActivedSubscriptors,
   getMyNewslettersSubscription,
 };
+
+function parseDataMyNewsletterSubscription(data){
+
+  let newsletters: Array<any> = []
+
+  try{
+    for (const attestation of data.attestations) {
+      const attestationObj = JSON.parse(attestation.decodedDataJson)
+      let newsletter = {
+        newsletterOnwer: attestationObj[0].value.value,
+        newsletterNonce: attestationObj[1].value.value
+      } 
+      newsletters.push(newsletter)
+    }
+
+    return newsletters
+    
+  } catch(error){
+    console.log(error)
+  }
+
+}
 
 export default easService;
