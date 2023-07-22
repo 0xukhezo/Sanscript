@@ -82,9 +82,9 @@ export default function Chat({
       <div>
         <MessageList messages={messageHistory} />
       </div>
-      {newsLetter.newsletterOwner === eoa && (
+      {newsLetter.newsletterOwner.id === eoa && (
         <>
-          <div className="w-full flex">
+          <div className="w-full flex mt-8">
             <Editor
               value={inputValue}
               onTextChange={(e) => setInputValue(e.htmlValue as string)}

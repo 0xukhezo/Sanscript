@@ -39,7 +39,7 @@ export default function NewNewsLetterForm({
   const [createSafeStatus, setCreateSafeStatus] = useState<boolean>(false);
 
   const usdcfake = "0xd55c3f5961Ec1ff0eC1741eDa7bc2f5962c3c454";
-  const lockAddress = "0xA2D9E8F5A795bFd3153bc50846d5080ca218c5ab";
+  const lockAddress = "0x5afbf4501e70cF5D24bD9a5aCDEe66DdCAf33136";
 
   const { isLoading: isLoadingApproveSafe } = useWaitForTransaction({
     hash: hashApproveSafe,
