@@ -1,19 +1,24 @@
 import { abi } from "@/abis/abis";
 import { ethers } from "ethers";
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { useWaitForTransaction } from "wagmi";
 import detectEthereumProvider from "@metamask/detect-provider";
 import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import { Web3AuthOptions } from "@web3auth/modal";
-
+import apeCoin1 from "../../../public/Apecoin.svg";
+import usdc1 from "../../../public/Usdc.svg";
 import { create } from "ipfs-http-client";
 import { Web3AuthModalPack } from "../../utils";
 import Loader from "../Loader/Loader";
+import Toggled from "../Toggled/Toggled";
 
 interface NewNewsLetterFormProps {
   getSuccess: (state: boolean) => void;
 }
+const apeCoin = { apeCoin1 };
+const usdc = { usdc1 };
 
 const WEB3AUTH_CLIENT_ID = process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID;
 const INFURA_KEY = process.env.NEXT_PUBLIC_INFURA_KEY;
@@ -39,7 +44,7 @@ export default function NewNewsLetterForm({
   const [createSafeStatus, setCreateSafeStatus] = useState<boolean>(false);
 
   const usdcfake = "0xd55c3f5961Ec1ff0eC1741eDa7bc2f5962c3c454";
-  const lockAddress = "0x5afbf4501e70cF5D24bD9a5aCDEe66DdCAf33136";
+  const lockAddress = "0x5726E5Fe247214DC0f1C2a9e590550B00962f87f";
 
   const { isLoading: isLoadingApproveSafe } = useWaitForTransaction({
     hash: hashApproveSafe,
@@ -173,6 +178,7 @@ export default function NewNewsLetterForm({
               ipfsLink,
               title,
               description,
+              usdcfake,
               ethers.utils.parseEther(price.toString()).toString()
             );
 
@@ -342,17 +348,38 @@ export default function NewNewsLetterForm({
           className="h-20 px-4 block w-full border-black rounded-lg  my-4 border-2 py-1.5 text-gray-900  placeholder:text-gray-400 sm:text-sm sm:leading-6"
         />
       </div>
-      <div>
-        <label className="text-lg text-lightText">Image:</label>
-        <input
-          type="file"
-          onChange={handleImageUpload}
-          accept="image/*"
-          name="ipfsLink"
-          id="ipfsLink"
-          className="px-4 block w-full border-black rounded-lg  my-4 border-2 py-1.5 text-gray-900  placeholder:text-gray-400 sm:text-sm sm:leading-6"
-        />
+      <div className="flex items-center justify-between">
+        <div>
+          <label className="text-lg text-lightText">Image:</label>
+          <input
+            type="file"
+            onChange={handleImageUpload}
+            accept="image/*"
+            name="ipfsLink"
+            id="ipfsLink"
+            className="px-4 block w-full border-black rounded-lg  my-4 border-2 py-1.5 text-gray-900  placeholder:text-gray-400 sm:text-sm sm:leading-6"
+          />
+        </div>
+        <div className="mt-6">
+          <Toggled />
+          <div className="flex w-20 justify-between">
+            {" "}
+            <Image
+              src={usdc.usdc1.src}
+              height={24}
+              width={24}
+              alt="Usdc Image"
+            />
+            <Image
+              src={apeCoin.apeCoin1.src}
+              height={24}
+              width={24}
+              alt="Aprcoin Image"
+            />
+          </div>
+        </div>
       </div>
+
       <div>
         <label className="text-lg text-lightText">Price:</label>
         <input
@@ -376,26 +403,26 @@ export default function NewNewsLetterForm({
       </div>
       {approveSafeStatus ? (
         isLoadingCreateSafe && !createSafeStatus ? (
-          <button className="px-10 py-2 bg-main rounded-lg flex mx-auto text-lightText items-center">
+          <button className="px-10 py-2 bg-main rounded-lg flex mx-auto text-white items-center">
             <span className="mr-2">Creating...</span>
             <Loader />
           </button>
         ) : (
           <button
-            className="px-10 py-2 bg-main rounded-lg flex mx-auto text-lightText"
+            className="px-10 py-2 bg-main rounded-lg flex mx-auto text-white"
             onClick={() => onCreateNewsLetterClick()}
           >
             Create!
           </button>
         )
       ) : isLoadingApproveSafe && !approveSafeStatus ? (
-        <button className="px-10 py-2 bg-main rounded-lg flex mx-auto text-lightText items-center">
+        <button className="px-10 py-2 bg-main rounded-lg flex mx-auto text-white items-center">
           <span className="mr-2">Approving...</span>
           <Loader />
         </button>
       ) : (
         <button
-          className="px-10 py-2 bg-main rounded-lg flex mx-auto text-lightText"
+          className="px-10 py-2 bg-main rounded-lg flex mx-auto text-white"
           onClick={() => onApporveClick()}
         >
           Approve

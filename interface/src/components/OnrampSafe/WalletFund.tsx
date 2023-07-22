@@ -51,14 +51,12 @@ function WalletFund({ owner, subscriber, newsletterNonce }: WalletFundProps) {
 
   return (
     <>
-      <div>
-        <button
-          className="px-2 py-2 bg-main rounded-lg ml-20"
-          onClick={fundWallet}
-        >
-          Pay with Fiat
-        </button>
-      </div>
+      <button
+        className="px-2 py-2 bg-main rounded-full ml-10 max-h-[60px] text-sm"
+        onClick={fundWallet}
+      >
+        Subscribe with Fiat
+      </button>
 
       <Transition.Root show={open} as={Fragment}>
         <Dialog

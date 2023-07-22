@@ -177,29 +177,32 @@ export default function Home() {
               </div>
             </section>
           ) : (
-            <section className="my-6 bg-grayStakingLinkHover p-4 rounded-xl">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl">Your Newsletters</h2>
-                {eoa !== null && (
-                  <button
-                    className="text-4xl"
-                    onClick={() => setOpenModal(true)}
-                  >
-                    +
-                  </button>
-                )}
-              </div>
-              <div className="flex justify-center mt-4 flex-col text-center">
-                {eoa !== null ? (
-                  <>
-                    <p>No newsletters yet! Create your own newsletter</p>
-                  </>
-                ) : (
-                  <>
-                    <p>Need to be connected to create a newsletter</p>
-                  </>
-                )}
-              </div>
+            <section className="my-6 p-4 rounded-xl">
+              <h2 className="text-2xl">Your Library</h2>
+              <section className="my-6 bg-grayStakingLinkHover p-4 rounded-xl">
+                <h2 className="text-2xl">Create a Newsletter</h2>
+                <div className="flex justify-center mt-4 flex-col text-start">
+                  {eoa !== null ? (
+                    <>
+                      <p>No newsletters yet! Create your own newsletter</p>
+                    </>
+                  ) : (
+                    <>
+                      <p>Need to be connected to create a newsletter</p>
+                    </>
+                  )}
+                </div>
+                <div className="flex items-center justify-between">
+                  {eoa !== null && (
+                    <button
+                      className="text-xl border-1 px-4 py-3 rounded-full mt-4 font-semilight"
+                      onClick={() => setOpenModal(true)}
+                    >
+                      Create Newsletter
+                    </button>
+                  )}
+                </div>
+              </section>
             </section>
           )}
           <div className="m-4">
@@ -244,7 +247,7 @@ export default function Home() {
         <div className="sticky top-0">
           <NavBar getStatus={getStatus} />
         </div>
-        <div className="h-[790px] overflow-auto ml-10">
+        <div className="h-[790px] overflow-auto mx-10">
           {newsLetters && newsLettersSubscribed ? (
             <Displayer
               newsLetters={newsLetters}

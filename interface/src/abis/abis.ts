@@ -22,9 +22,29 @@ export const abi = {
           name: "_easSchema",
           type: "bytes32",
         },
+        {
+          internalType: "contract IWorldID",
+          name: "_worldId",
+          type: "address",
+        },
+        {
+          internalType: "string",
+          name: "_appId",
+          type: "string",
+        },
+        {
+          internalType: "string",
+          name: "_action",
+          type: "string",
+        },
       ],
       stateMutability: "nonpayable",
       type: "constructor",
+    },
+    {
+      inputs: [],
+      name: "InvalidNullifier",
+      type: "error",
     },
     {
       anonymous: false,
@@ -37,9 +57,9 @@ export const abi = {
         },
         {
           indexed: false,
-          internalType: "uint256",
+          internalType: "uint8",
           name: "newsletterNonce",
-          type: "uint256",
+          type: "uint8",
         },
         {
           indexed: false,
@@ -58,6 +78,12 @@ export const abi = {
           internalType: "string",
           name: "description",
           type: "string",
+        },
+        {
+          indexed: false,
+          internalType: "address",
+          name: "token",
+          type: "address",
         },
         {
           indexed: false,
@@ -80,9 +106,9 @@ export const abi = {
         },
         {
           indexed: false,
-          internalType: "uint256",
+          internalType: "uint8",
           name: "newsletterNonce",
-          type: "uint256",
+          type: "uint8",
         },
         {
           indexed: false,
@@ -114,6 +140,19 @@ export const abi = {
       type: "event",
     },
     {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          internalType: "address",
+          name: "owner",
+          type: "address",
+        },
+      ],
+      name: "VerifiedHumanOwner",
+      type: "event",
+    },
+    {
       inputs: [
         {
           internalType: "string",
@@ -131,6 +170,11 @@ export const abi = {
           type: "string",
         },
         {
+          internalType: "address",
+          name: "token",
+          type: "address",
+        },
+        {
           internalType: "uint256",
           name: "pricePerMonth",
           type: "uint256",
@@ -144,9 +188,9 @@ export const abi = {
     {
       inputs: [
         {
-          internalType: "uint256",
+          internalType: "uint8",
           name: "newsletterNonce",
-          type: "uint256",
+          type: "uint8",
         },
         {
           internalType: "uint256",
@@ -203,6 +247,11 @@ export const abi = {
           type: "string",
         },
         {
+          internalType: "address",
+          name: "token",
+          type: "address",
+        },
+        {
           internalType: "uint256",
           name: "pricePerMonth",
           type: "uint256",
@@ -252,9 +301,9 @@ export const abi = {
           type: "address",
         },
         {
-          internalType: "uint256",
+          internalType: "uint8",
           name: "newsletterNonce",
-          type: "uint256",
+          type: "uint8",
         },
       ],
       name: "subscribeNewsletter",
@@ -271,6 +320,34 @@ export const abi = {
         },
       ],
       name: "transferOwnership",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "signal",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "root",
+          type: "uint256",
+        },
+        {
+          internalType: "uint256",
+          name: "nullifierHash",
+          type: "uint256",
+        },
+        {
+          internalType: "uint256[8]",
+          name: "proof",
+          type: "uint256[8]",
+        },
+      ],
+      name: "verifyAndExecute",
       outputs: [],
       stateMutability: "nonpayable",
       type: "function",
