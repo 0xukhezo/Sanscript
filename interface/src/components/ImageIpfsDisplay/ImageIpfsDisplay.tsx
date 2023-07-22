@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { create } from "ipfs-http-client";
+import { useRouter } from "next/router";
 
 interface ImageDisplayProps {
   cid: string;
@@ -8,6 +9,7 @@ interface ImageDisplayProps {
 
 export default function ImageDisplay({ cid }: ImageDisplayProps) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchImageFromIPFS = async () => {
@@ -46,10 +48,14 @@ export default function ImageDisplay({ cid }: ImageDisplayProps) {
       {imageSrc ? (
         <Image
           src={imageSrc}
-          height={205}
-          width={270}
+          height={router.route !== "/" ? 400 : 205}
+          width={router.route !== "/" ? 400 : 270}
           alt="Newsletter Image"
-          className="object-cover w-[300px] h-[135px] rounded-t-lg"
+          className={
+            router.route !== "/"
+              ? "object-cover w-[500px] h-[300px] rounded-t-lg"
+              : "object-cover w-[300px] h-[135px] rounded-t-lg"
+          }
         ></Image>
       ) : (
         <p>Loading... </p>

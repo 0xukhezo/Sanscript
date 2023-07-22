@@ -7,12 +7,15 @@ import { client, NewsLetters } from "./api/Newsletters";
 import ImageIpfsDisplay from "@/components/ImageIpfsDisplay/ImageIpfsDisplay";
 import NavBar from "@/components/Layout/NavBar";
 import { useRouter } from "next/router";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 let PEER_ADDRESS = "0xB59A5a10E7543AbfBd10D593834AE959f54BCB8C";
 
 export default function NewLetter() {
   const [eoa, setEoa] = useState<string>("");
   const [newsLetter, setNewsLetter] = useState<Object[]>([]);
+  const [newsLetterSuscribed, setNewsLetterSuscribed] = useState<Object[]>([]);
   const [status, setStatus] = useState<boolean>(false);
   const [messages, setMessages] = useState<any>(null);
   const convRef = useRef<any>(null);
@@ -20,12 +23,11 @@ export default function NewLetter() {
   const [signer, setSigner] = useState<any>(null);
   const [isOnNetwork, setIsOnNetwork] = useState<any>(false);
   const router = useRouter();
-  console.log(router.query.newLetter);
-
+  console.log(newsLetterSuscribed);
   const test = {
     id: "0x01",
     image: "QmYfsY8qEdHbvpnwXL25bcyeGpRPLjAKCXAY8hkK5L678x",
-    newsletterOwner: { id: "0x31AE9D5A302bAEC5A1c5fBeeB8A1308364BeFC80" },
+    newsletterOwner: { id: "0x31AE9D5A302bAEa5A1c5fBeeB8A1308364BeFC80" },
     newsletterNonce: 1,
     title: "Newsletter 1",
     description:
@@ -36,13 +38,59 @@ export default function NewLetter() {
     transactionHash: "0xabcdef1234567890",
   };
 
+  function decodeJsonString(jsonString: any) {
+    const parsedJsonArray = jsonString.map((item: any) => {
+      const parsedValue = JSON.parse(item.value);
+      return {
+        ...item,
+        value: parsedValue,
+      };
+    });
+
+    return parsedJsonArray;
+  }
+
+  async function fetchNewsletterByAddress() {
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    });
+    const apiUrl = `http://localhost:3001/api/v1/newsletter/${ethers.utils.getAddress(
+      accounts[0]
+    )}`;
+
+    try {
+      const response = await fetch(apiUrl);
+
+      if (!response.ok) {
+        throw new Error("No se pudo obtener la respuesta del servidor.");
+      }
+
+      const data = await response.json();
+      console.log(data.attestations);
+      const decodedArray = data.attestations.map((item: any) => {
+        console.log(item);
+        return decodeJsonString(item.decodedDataJson);
+      });
+
+      setNewsLetterSuscribed(decodedArray);
+      return data;
+    } catch (error) {
+      console.error("Error al obtener los datos:", error);
+      throw error;
+    }
+  }
+
   async function fetchNewsLetters(query: string) {
-    const queryBody = `  newsletters(where: {title: "${query}"}) {
+    const queryBody = `newsletters(where: {title: "${query}"}) {
       id
       image
       description
+      newsletterOwner {
+        id
+      }
       pricePerMonth
       title
+      newsletterNonce
     }
   }`;
 
@@ -96,6 +144,7 @@ export default function NewLetter() {
     } else {
       console.error("Metamask not found");
     }
+    fetchNewsletterByAddress();
   }, []);
 
   useEffect(() => {
@@ -132,10 +181,25 @@ export default function NewLetter() {
     setEoa(localStorage.getItem("eoa") as string);
   }, [status]);
 
+  useEffect(() => {
+    setEoa(localStorage.getItem("eoa") as string);
+  }, []);
+
+  useEffect(() => {
+    setEoa(localStorage.getItem("eoa") as string);
+  }, [eoa]);
+
   return (
     <>
       <NavBar getStatus={getStatus} />
       <div className="mt-4 mx-8 ">
+        <Link className="mb-4 flex items-center text-xl" href="/">
+          <ChevronLeftIcon
+            className="h-4 w-4 text-white mt-0.5"
+            aria-hidden="true"
+          />
+          <span>Back</span>
+        </Link>
         <div className="grid flex-row grid-cols-3 bg-darkBackground rounded-xl px-4 py-8">
           <ImageIpfsDisplay cid={test.image} />
           <div className="col-span-2 ml-10">
@@ -144,18 +208,28 @@ export default function NewLetter() {
               {test.newsletterOwner.id}
             </div>
             <div className="text-lg font-light my-4">{test.description}</div>
-            <div>
-              {ethers.utils
-                .formatUnits(test.pricePerMonth.toString(), 18)
-                .toString()}
-              USDC
+            <div className="text-sm font-light my-4">
+              Price:
+              <span className="text-main">
+                <span className="ml-1.5">$</span>
+                <span>
+                  {ethers.utils
+                    .formatUnits(test.pricePerMonth.toString(), 18)
+                    .toString()}
+                </span>
+                <span className="mx-3">USDC</span>
+              </span>
             </div>
             {test.newsletterOwner.id !== eoa && (
               <div className="flex mt-10">
                 <button className="px-2 py-2 bg-main rounded-lg">
                   Subscribe
                 </button>
-                <WalletFund />
+                <WalletFund
+                  owner={test.newsletterOwner.id}
+                  subscriber={eoa}
+                  newsletterNonce={test.newsletterNonce}
+                />
               </div>
             )}
             {!isOnNetwork &&
