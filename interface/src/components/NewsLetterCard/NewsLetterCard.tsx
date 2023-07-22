@@ -7,6 +7,7 @@ interface NewsLetterCardProps {
   image: string;
   owner: `0x${string}`;
   title: string;
+  id: string;
   description: string;
   price: number;
 }
@@ -14,13 +15,14 @@ interface NewsLetterCardProps {
 function NewsLetterCard({
   image,
   owner,
+  id,
   title,
   description,
   price,
 }: NewsLetterCardProps) {
   return (
-    <article key={title} className="cardStakingHover rounded-lg relative">
-      <Link href={`/${title}`}>
+    <article key={id} className="cardStakingHover rounded-lg relative">
+      <Link href={`/${id}`}>
         {" "}
         <p className="text-main absolute top-0 right-0 mr-3 mt-1 font-extrelight text-sm bg-cardGradientDark px-2 rounded-full">
           <span className="mr-0.5">$</span>{" "}

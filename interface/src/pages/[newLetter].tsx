@@ -52,12 +52,12 @@ type Icon = {
   href: string;
 };
 
-let PEER_ADDRESS = "0xB59A5a10E7543AbfBd10D593834AE959f54BCB8C";
-
 export default function NewLetter() {
   const [eoa, setEoa] = useState<string>("");
-  const [newsLetter, setNewsLetter] = useState<Object[]>([]);
+  const [newsLetter, setNewsLetter] = useState<any>();
+  const [subscriptors, setSubscriptors] = useState<any>();
   const [newsLettersOwned, setNewsLettersOwned] = useState<Object[]>([]);
+  const [conexionType, setConexionType] = useState<string | null>("");
   const [newsLetterSuscribed, setNewsLetterSuscribed] = useState<Object[]>([]);
   const [status, setStatus] = useState<boolean>(false);
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -68,37 +68,37 @@ export default function NewLetter() {
   const [isOnNetwork, setIsOnNetwork] = useState<any>(false);
   const router = useRouter();
 
-  const test = {
-    id: "0x01",
-    image: "QmYfsY8qEdHbvpnwXL25bcyeGpRPLjAKCXAY8hkK5L678x",
-    newsletterOwner: { id: "0x31AE9D5A302bAEa5A1c5fBeeB8A1308364BeFC80" },
-    newsletterNonce: 1,
-    title: "Push Protocol",
-    description:
-      "Get the early bird access to the latest updates in the Push Protocol. This is a dummy text: But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful.",
-    pricePerMonth: 14990000000000000000,
-    blockNumber: 1000,
-    blockTimestamp: 1626342000,
-    transactionHash: "0xabcdef1234567890",
-  };
+  async function fetchNewsletterSuscriptor() {
+    const route = router.query.newLetter as string;
+    const nonce = route?.substring(route?.lastIndexOf("_") + 1);
 
-  function parseDecodedData(decodedData: any) {
-    return JSON.parse(decodedData);
-  }
+    const apiUrl = `http://localhost:3001/api/v1/newsletter/subscriptors?newsletterOwner=${ethers.utils.getAddress(
+      route?.substring(0, route?.lastIndexOf("_"))
+    )}&newsletterNonce=${nonce}`;
 
-  function extractAndTransformValueObject(item: any) {
-    return item.decodedDataJson.reduce((result: any, decodedItem: any) => {
-      if (decodedItem.value && decodedItem.value.value !== undefined) {
-        result[decodedItem.name] = decodedItem.value.value;
+    try {
+      const response = await fetch(apiUrl);
+
+      if (!response.ok) {
+        throw new Error("No se pudo obtener la respuesta del servidor.");
       }
-      return result;
-    }, {});
+
+      const data = await response.json();
+
+      setSubscriptors(data);
+
+      return data;
+    } catch (error) {
+      console.error("Error al obtener los datos:", error);
+      throw error;
+    }
   }
 
   async function fetchNewsletterByAddress() {
     const accounts = await window.ethereum.request({
       method: "eth_requestAccounts",
     });
+
     const apiUrl = `http://localhost:3001/api/v1/newsletter/${ethers.utils.getAddress(
       accounts[0]
     )}`;
@@ -112,17 +112,19 @@ export default function NewLetter() {
 
       const data = await response.json();
 
-      const newArray = data.attestations.map((item: any) => {
-        return {
-          decodedDataJson: [parseDecodedData(item.decodedDataJson)],
-        };
+      const route = router.query.newLetter as string;
+
+      const isStringInArray = data.some((obj: any) => {
+        console.log(
+          obj.newsletterOnwer ===
+            ethers.utils.getAddress(
+              route?.substring(0, route?.lastIndexOf("_"))
+            )
+        );
+        obj.newsletterOnwer ===
+          ethers.utils.getAddress(route?.substring(0, route?.lastIndexOf("_")));
       });
-      console.log(newArray[0]);
-      const transformedArray = newArray.map((item: any) =>
-        extractAndTransformValueObject(item)
-      );
-      console.log(transformedArray);
-      setNewsLetterSuscribed(transformedArray);
+      setNewsLetterSuscribed(isStringInArray);
       return data;
     } catch (error) {
       console.error("Error al obtener los datos:", error);
@@ -131,23 +133,24 @@ export default function NewLetter() {
   }
 
   async function fetchNewsLetter(query: string) {
-    const queryBody = `newsletters(where: {title: "${query}"}) {
-      id
-      image
-      description
-      newsletterOwner {
+    const queryBody = `query {
+      newsletters(where: {id: "${query}"}) {
         id
+        image
+        description
+        pricePerMonth
+        title
+        newsletterOwner {
+          id
+        }
+        newsletterNonce
       }
-      pricePerMonth
-      title
-      newsletterNonce
-    }
-  }`;
+    }`;
 
     try {
       let response = await client.query({ query: NewsLetters(queryBody) });
-      console.log(response.data.newsletters);
-      setNewsLetter(response.data.newsletters);
+
+      setNewsLetter(response.data.newsletters[0]);
     } catch (err) {
       console.log({ err });
     }
@@ -185,11 +188,11 @@ export default function NewLetter() {
   }
 
   const newConversation = async function (xmtp_client: any, addressTo: any) {
-    if (eoa !== test.newsletterOwner.id) {
-      PEER_ADDRESS = test.newsletterOwner.id;
-      addressTo = test.newsletterOwner.id;
+    console.log(eoa.toLowerCase(), newsLetter.newsletterOwner.id);
+    if (eoa.toLowerCase() !== newsLetter.newsletterOwner.id) {
+      addressTo = newsLetter.newsletterOwner.id;
     }
-    if (await xmtp_client?.canMessage(PEER_ADDRESS)) {
+    if (await xmtp_client?.canMessage(addressTo)) {
       const conversation = await xmtp_client.conversations.newConversation(
         addressTo
       );
@@ -204,8 +207,7 @@ export default function NewLetter() {
 
   const initXmtp = async function () {
     const xmtp = await Client.create(signer, { env: "production" });
-
-    newConversation(xmtp, PEER_ADDRESS);
+    subscriptors.forEach((value: any) => newConversation(xmtp, value));
 
     setIsOnNetwork(!!xmtp.address);
 
@@ -213,8 +215,10 @@ export default function NewLetter() {
   };
 
   useEffect(() => {
-    fetchNewsLetters();
-    fetchNewsLetter(router.query.newLetter as string);
+    const type = localStorage.getItem("Web3Auth-cachedAdapter");
+    setConexionType(type);
+    router !== undefined && fetchNewsLetters();
+    router !== undefined && fetchNewsLetter(router.query.newLetter as string);
     setEoa(localStorage.getItem("eoa") as string);
     if (typeof window.ethereum !== "undefined") {
       try {
@@ -226,12 +230,7 @@ export default function NewLetter() {
     } else {
       console.error("Metamask not found");
     }
-    fetchNewsletterByAddress();
   }, []);
-
-  useEffect(() => {
-    fetchNewsLetters(router.query.newLetter as string);
-  }, [router]);
 
   const getStatus = (statusNavbar: boolean) => {
     setStatus(statusNavbar);
@@ -243,6 +242,8 @@ export default function NewLetter() {
 
   useEffect(() => {
     setEoa(localStorage.getItem("eoa") as string);
+    fetchNewsLetter(router.query.newLetter as string);
+    fetchNewsletterSuscriptor();
   }, [eoa]);
 
   useEffect(() => {
@@ -274,6 +275,73 @@ export default function NewLetter() {
   useEffect(() => {
     setEoa(localStorage.getItem("eoa") as string);
   }, [eoa]);
+
+  const onCreateNewsLetterClick = async () => {
+    if (conexionType === "openlogin") {
+      if (web3AuthModalPack && web3AuthModalPack.getProvider()) {
+        (async () => {
+          try {
+            const provider = new ethers.providers.Web3Provider(
+              web3AuthModalPack?.getProvider()!
+            );
+            const signer = provider.getSigner();
+            const erc20Contract = new ethers.Contract(
+              lockAddress,
+              abi.subsblockAbi,
+              signer
+            );
+            const tx = await erc20Contract.addNewsletter(
+              ipfsLink,
+              title,
+              description,
+              usdcfake,
+              ethers.utils.parseEther(price.toString()).toString()
+            );
+
+            setHashCreateSafe(tx.hash);
+            const txReceiptStatus = await waitForTransactionReceipt(
+              tx.hash,
+              provider
+            );
+            txReceiptStatus === 1 && setCreateSafeStatus(true);
+            getSuccess(true);
+          } catch (error) {
+            console.error("Error:", error);
+          }
+        })();
+      }
+    } else {
+      try {
+        if (hasProvider) {
+          const accounts = await window.ethereum.request({
+            method: "eth_requestAccounts",
+          });
+          const signer = new ethers.providers.Web3Provider(
+            window.ethereum
+          ).getSigner(accounts[0]);
+          const erc20Contract = new ethers.Contract(
+            lockAddress,
+            abi.subsblockAbi,
+            signer
+          );
+          const tx = await erc20Contract.addNewsletter(
+            ipfsLink,
+            title,
+            description,
+            usdcfake,
+            ethers.utils.parseEther(price.toString()).toString()
+          );
+          setHashCreateSafe(tx.hash);
+
+          const txReceiptStatus = await waitForTransactionReceipt(tx.hash);
+          txReceiptStatus && setCreateSafeStatus(true);
+          getSuccess(true);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
   return (
     <>
@@ -401,62 +469,77 @@ export default function NewLetter() {
           <div className="sticky top-0">
             <NavBar getStatus={getStatus} />
           </div>
-          <div className="h-[790px] overflow-auto pl-10">
-            <div className=" bg-darkBackground rounded-xl px-4 mt-4">
-              <ImageIpfsDisplay cid={test.image} />
-              <div className="mx-4">
-                <div className="text-4xl flex flex-row justify-between items-center mt-6">
-                  <span>{test.title}</span>
-                  <div className="flex flex-row items-center">
-                    {!isOnNetwork &&
-                      (test.newsletterOwner.id === eoa ? (
-                        <button
-                          onClick={initXmtp}
-                          className="px-2 py-2 bg-main rounded-full max-h-[30px] text-sm"
-                        >
-                          Write Newsletter
-                        </button>
-                      ) : (
-                        <button
-                          onClick={initXmtp}
-                          className="px-2 py-2 bg-main rounded-full max-h-[60px] text-sm"
-                        >
-                          Read Newsletter
-                        </button>
-                      ))}
-                    {test.newsletterOwner.id !== eoa && (
-                      <div className="flex">
-                        <button className="px-2 py-2 bg-main rounded-full max-h-[60px] text-sm ml-10">
-                          Subscribe with USDC
-                        </button>
-                        <WalletFund
-                          owner={test.newsletterOwner.id}
-                          subscriber={eoa}
-                          newsletterNonce={test.newsletterNonce}
-                        />
-                      </div>
-                    )}
+          {newsLetter !== undefined ? (
+            <div className="h-[790px] overflow-auto pl-10">
+              <div className=" bg-darkBackground rounded-xl px-4 mt-4">
+                <ImageIpfsDisplay cid={newsLetter.image} />
+                <div className="mx-4">
+                  <div className="text-4xl flex flex-row justify-between items-center mt-6">
+                    <span>{newsLetter.title}</span>
+                    {/* {console.log(
+                      newsLetter.newsletterOwner.id,
+                      eoa.toLowerCase(),
+                      newsLetterSuscribed
+                    )} */}
+                    <div className="flex flex-row items-center">
+                      {!isOnNetwork &&
+                        (newsLetter.newsletterOwner.id === eoa.toLowerCase() ? (
+                          <button
+                            onClick={initXmtp}
+                            className="px-2 py-2 bg-main rounded-full max-h-[60px] text-sm"
+                          >
+                            Write Newsletter
+                          </button>
+                        ) : (
+                          newsLetterSuscribed && (
+                            <button
+                              onClick={initXmtp}
+                              className="px-2 py-2 bg-main rounded-full max-h-[60px] text-sm"
+                            >
+                              Read Newsletter
+                            </button>
+                          )
+                        ))}
+                      {newsLetter.newsletterOwner.id !== eoa.toLowerCase() &&
+                        !newsLetterSuscribed && (
+                          <div className="flex">
+                            <button
+                              className="px-2 py-2 bg-main rounded-full max-h-[60px] text-sm ml-10"
+                              onClick={() => onCreateNewsLetterClick()}
+                            >
+                              Subscribe with APE Coin
+                            </button>
+                            <WalletFund
+                              owner={newsLetter.newsletterOwner.id}
+                              subscriber={eoa}
+                              newsletterNonce={newsLetter.newsletterNonce}
+                            />
+                          </div>
+                        )}
+                    </div>
+                  </div>
+                  <div className="text-sm font-light my-4">
+                    {newsLetter.newsletterOwner.id}
+                  </div>
+                  <div className="text-lg font-light my-4">
+                    {newsLetter.description}
                   </div>
                 </div>
-                <div className="text-sm font-light my-4">
-                  {test.newsletterOwner.id}
-                </div>
-                <div className="text-lg font-light my-4">
-                  {test.description}
-                </div>
               </div>
-            </div>
 
-            {isOnNetwork && messages && eoa && (
-              <div className="bg-darkBackground rounded-xl px-4 py-8 mt-4">
-                <Chat
-                  conversation={convRef.current}
-                  messageHistory={messages}
-                  newsLetter={test}
-                />{" "}
-              </div>
-            )}
-          </div>
+              {isOnNetwork && messages && eoa && (
+                <div className="bg-darkBackground rounded-xl px-4 py-8 mt-4">
+                  <Chat
+                    conversation={convRef.current}
+                    messageHistory={messages}
+                    newsLetter={newsLetter}
+                  />{" "}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div>Loading</div>
+          )}
         </section>{" "}
         {openModal && <CreateNewsLetterModal getOpenModal={getOpenModal} />}
       </main>

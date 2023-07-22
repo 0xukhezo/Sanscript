@@ -16,7 +16,7 @@ export interface WalletFundProps {
 function WalletFund({ owner, subscriber, newsletterNonce }: WalletFundProps) {
   const [open, setOpen] = useState(false);
   const cancelButtonRef = useRef(null);
-  console.log(owner, subscriber, newsletterNonce);
+
   const handlePaymentSuccessful = async (eventData: SafeOnRampEvent) => {
     await axios.post("http://localhost:3001/api/v1/newsletter/subscription", {
       newsletterOwner: owner,

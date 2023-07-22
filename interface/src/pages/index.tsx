@@ -117,6 +117,7 @@ export default function Home() {
 
   useEffect(() => {
     getFilteres();
+    fetchNewsLetters();
   }, [eoa, status]);
 
   useEffect(() => {
