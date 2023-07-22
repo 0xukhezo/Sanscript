@@ -49,14 +49,14 @@ export default function ImageDisplay({ cid }: ImageDisplayProps) {
         <Image
           src={imageSrc}
           height={router.route !== "/" ? 400 : 205}
-          width={router.route !== "/" ? 400 : 270}
+          width={router.route !== "/" ? 400 : 1000}
           alt="Newsletter Image"
           className={
             router.route !== "/"
-              ? "object-cover w-[500px] h-[300px] rounded-t-lg"
+              ? "object-cover w-[1168px] h-[229px]"
               : "object-cover w-[300px] h-[135px] rounded-t-lg"
           }
-        ></Image>
+        />
       ) : (
         <p>Loading... </p>
       )}
