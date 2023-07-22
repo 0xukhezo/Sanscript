@@ -8,29 +8,21 @@ import {
 } from "@safe-global/onramp-kit";
 
 export interface WalletFundProps {
-  address: string;
+  owner: string;
+  subscriber: string;
+  newsletterNonce: number;
 }
 
-function WalletFund() {
+function WalletFund({ owner, subscriber, newsletterNonce }: WalletFundProps) {
   const [open, setOpen] = useState(false);
   const cancelButtonRef = useRef(null);
-  const [address, setAddress] = useState<string>(
-    "0x28962eEdacA9D89b41fcE2D3A2e89A28469e1ecf"
-  );
-
-  function handleAddressChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setAddress(event.target.value);
-  }
-
+  console.log(owner, subscriber, newsletterNonce);
   const handlePaymentSuccessful = async (eventData: SafeOnRampEvent) => {
-    const response = await axios.post(
-      "http://localhost:3001/api/v1/newsletter/subscription",
-      {
-        newsletterOwner: address,
-        newsletterNonce: 0, //TODO
-        recipient: "0xA4a3aC7cBA6B584c674737e7a04d760433147287", //TODO
-      }
-    );
+    await axios.post("http://localhost:3001/api/v1/newsletter/subscription", {
+      newsletterOwner: owner,
+      newsletterNonce: newsletterNonce,
+      recipient: subscriber,
+    });
   };
 
   const fundWallet = async () => {
@@ -45,7 +37,7 @@ function WalletFund() {
     setOpen(true);
 
     const sessionData = await safeOnRamp.open({
-      walletAddress: address,
+      walletAddress: owner,
       networks: ["ethereum"],
       element: "#stripe-root",
       events: {

@@ -3,87 +3,96 @@ import easService from "../services/eas-service";
 import pushService from "../services/push-service";
 
 const HTTP_ERROR_STATUS = 400;
-const HTTP_SERVER_ERROR = 500
+const HTTP_SERVER_ERROR = 500;
 
 type subscriptionBodyType = {
-    newsletterOwner: string;
-    newsletterNonce: string;
-    recipient: string;
+  newsletterOwner: string;
+  newsletterNonce: string;
+  recipient: string;
 };
 
 //Generate attestation when subscription is payed by safeonramp callback
 async function subscriptionNewsletter(
-    request: RequestType,
-    response: ResponseType
+  request: RequestType,
+  response: ResponseType
 ) {
-    try {
+  try {
+    const attestationUID = await easService.generateAttestation(
+      request.body.newsletterOwner,
+      request.body.newsletterNonce,
+      request.body.recipient,
+      1
+    ); //TODO month
 
-        const attestationUID = await easService.generateAttestation(request.body.newsletterOwner, request.body.newsletterNonce, request.body.recipient, 1) //TODO month
+    return response.send(attestationUID);
+  } catch (error: any) {
+    response.status(HTTP_SERVER_ERROR);
 
-        return response.send(attestationUID);
-    } catch (error: any) {
-        response.status(HTTP_ERROR_STATUS);
-
-        return response.send(error.response);
-    }
+    return response.send(error.response);
+  }
 }
 
 //Send notificatios to list addresses when send a new newsletter
 async function newsletterPushNotification(
-    request: RequestType,
-    response: ResponseType
+  request: RequestType,
+  response: ResponseType
 ) {
-    try {
+  try {
+    await pushService.sendPushNotification(
+      request.body.addresses,
+      request.body.owner,
+      request.body.newsletterTitle,
+      request.body.newsletterText
+    );
 
-        await pushService.sendPushNotification(request.body.addresses,request.body.owner,request.body.newsletterTitle, request.body.newsletterText)
+    return response.send("OK");
+  } catch (error: any) {
+    response.status(HTTP_ERROR_STATUS);
 
-        return response.send("OK");
-
-    } catch (error: any) {
-        response.status(HTTP_ERROR_STATUS);
-
-        return response.send(error.response);
-    }
+    return response.send(error.response);
+  }
 }
 
-async function getActivedSubscriptors(request: RequestType, response: ResponseType) {
+async function getActivedSubscriptors(
+  request: RequestType,
+  response: ResponseType
+) {
+  try {
+    const activedAddress = await easService.getActivedSubscriptors(
+      request.query.newsletterOwner as string,
+      request.query.newsletterNonce as string
+    );
 
-    try{
+    return response.send(activedAddress);
+  } catch (error: any) {
+    response.status(HTTP_ERROR_STATUS);
 
-        const activedAddress = await easService.getActivedSubscriptors(request.query.newsletterOwner as string, request.query.newsletterNonce as string)
-
-        return response.send(activedAddress)
-
-    } catch(error: any){
-        response.status(HTTP_ERROR_STATUS);
-
-        return response.send(error.response);
-    }
-    
+    return response.send(error.response);
+  }
 }
 
-async function getMyNewslettersSubscription(request: RequestType, response: ResponseType){
+async function getMyNewslettersSubscription(
+  request: RequestType,
+  response: ResponseType
+) {
+  try {
+    const data = await easService.getMyNewslettersSubscription(
+      request.params.address
+    );
 
-    try {
+    return response.send(data);
+  } catch (error: any) {
+    response.status(HTTP_SERVER_ERROR);
 
-        const data = easService.getMyNewslettersSubscription(request.params.address)
-
-        return response.send(data)
-
-    }catch(error: any){
-        response.status(HTTP_SERVER_ERROR);
-
-        return response.send(error.response);
-    }
-
+    return response.send(error.response);
+  }
 }
-
 
 const newsletterController = {
-    subscriptionNewsletter,
-    newsletterPushNotification,
-    getActivedSubscriptors,
-    getMyNewslettersSubscription
+  subscriptionNewsletter,
+  newsletterPushNotification,
+  getActivedSubscriptors,
+  getMyNewslettersSubscription,
 };
 
 export default newsletterController;
