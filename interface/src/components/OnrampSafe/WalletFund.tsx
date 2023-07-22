@@ -24,7 +24,7 @@ function WalletFund() {
 
   const handlePaymentSuccessful = async (eventData: SafeOnRampEvent) => {
     const response = await axios.post(
-      "http://localhost:3001/api/v1/subscription",
+      "http://localhost:3001/api/v1/newsletter/subscription",
       {
         newsletterOwner: address,
         newsletterNonce: 0, //TODO

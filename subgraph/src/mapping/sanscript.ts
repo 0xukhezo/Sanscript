@@ -1,6 +1,7 @@
 import {
   AddedNewsletter as AddedNewsletterEvent,
-  ChangedNewsletterPrice as ChangedNewsletterPriceEvent
+  ChangedNewsletterPrice as ChangedNewsletterPriceEvent,
+  VerifiedHumanOwner as VerifiedHumanOwnerEvent
 } from "../../generated/Sanscript/Sanscript"
 import {
   Newsletter,
@@ -16,6 +17,7 @@ export function handleAddedNewsletter(event: AddedNewsletterEvent): void {
   if (owner == null) {
     owner = new Owner(event.params.newsletterOwner.toHexString())
     owner.newslettersAmount = ONE_BI
+    owner.isVerifiedHuman = false
   } else {
     owner.newslettersAmount = owner.newslettersAmount.plus(ONE_BI)
   }
@@ -59,5 +61,26 @@ export function handleChangedNewsletterPrice(
   }
 
   newsletter.save()
+}
+
+export function handleVerifiedHumanOwner(
+  event: VerifiedHumanOwnerEvent
+):void {
+
+  let owner = Owner.load(event.params.owner.toString())
+
+  if(owner == null){
+    log.error("Owner {} not found. tx_hash: {}", [
+      event.params.owner.toHexString(),
+      event.transaction.hash.toHexString()
+    ]);
+    return
+  }
+
+  owner.isVerifiedHuman = true
+  owner.save()
+
+
+
 }
 
