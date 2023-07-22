@@ -1,21 +1,14 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
 
-  const lockedAmount = ethers.parseEther("0.001");
+  const Sanscript = await ethers.getContractFactory("Sanscript");
+  const sanscript = await Sanscript.deploy(process.env.USDC!, process.env.PRICE!, process.env.EAS_ADDRESS!, process.env.SCHEMA_UID!, process.env.WORLD_ID!, process.env.APP_ID!, process.env.ACTION_ID!);
 
-  const lock = await ethers.deployContract("Lock", [unlockTime], {
-    value: lockedAmount,
-  });
-
-  await lock.waitForDeployment();
+  await sanscript.waitForDeployment();
 
   console.log(
-    `Lock with ${ethers.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.target}`
+    `Sanscript with deployed to ${sanscript.target}`
   );
 }
 
