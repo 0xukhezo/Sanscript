@@ -31,6 +31,7 @@ export function handleAddedNewsletter(event: AddedNewsletterEvent): void {
   newsletter.newsletterNonce = event.params.newsletterNonce
   newsletter.image = event.params.image
   newsletter.title = event.params.title
+  newsletter.token = event.params.token.toHexString()
   newsletter.description = event.params.description
   newsletter.pricePerMonth = event.params.pricePerMonth
 

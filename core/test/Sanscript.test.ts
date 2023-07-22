@@ -33,6 +33,7 @@ describe("sanscript.test", function () {
                     "QmeY1hzYDbwKGGbsQbPDX8bsWN8CgCtDnfUeMmpXJaTUea",
                     "My first newsletter", 
                     "My first newsletter where i am going to speak about DeFi",
+                    testERC20.target,
                     ethers.parseEther("10")
                 )
             )
@@ -43,6 +44,7 @@ describe("sanscript.test", function () {
                 "QmeY1hzYDbwKGGbsQbPDX8bsWN8CgCtDnfUeMmpXJaTUea",
                 "My first newsletter", 
                 "My first newsletter where i am going to speak about DeFi",
+                testERC20.target,
                 ethers.parseEther("10")
             )
 
@@ -57,6 +59,7 @@ describe("sanscript.test", function () {
                 "QmeY1hzYDbwKGGbsQbPDX8bsWN8CgCtDnfUeMmpXJaTUea",
                 "My first newsletter", 
                 "My first newsletter where i am going to speak about DeFi",
+                testERC20.target,
                 ethers.parseEther("10")
             )
             await tx1.wait(1)
@@ -65,17 +68,19 @@ describe("sanscript.test", function () {
                 "QmeY1hzYDbwKGGbsQbPDX8bsWN8CgCtDnfUeMmpXJaTUea",
                 "My second newsletter", 
                 "My second newsletter where i am going to speak about DeFi2.0",
+                testERC20.target,
                 ethers.parseEther("10")
             )
             const txReceipt2 = await tx2.wait(1)
             
-            const [newsletterOwner, newsletterNonce, image, title, description, pricePerMonth] = txReceipt2?.logs[2].args
+            const [newsletterOwner, newsletterNonce, image, title, description, token, pricePerMonth] = txReceipt2?.logs[2].args
          
             expect(newsletterOwner).to.equal(account1.address)
             expect(newsletterNonce).to.equal(1)
             expect(image).to.equal("QmeY1hzYDbwKGGbsQbPDX8bsWN8CgCtDnfUeMmpXJaTUea")
             expect(title).to.equal("My second newsletter")
             expect(description).to.equal("My second newsletter where i am going to speak about DeFi2.0")
+            expect(token).to.equal(testERC20.target)
             expect(pricePerMonth).to.equal(ethers.parseEther("10"))
         });
 
@@ -92,6 +97,7 @@ describe("sanscript.test", function () {
                 "QmeY1hzYDbwKGGbsQbPDX8bsWN8CgCtDnfUeMmpXJaTUea",
                 "My first newsletter", 
                 "My first newsletter where i am going to speak about DeFi",
+                testERC20.target,
                 ethers.parseEther("10") 
             )
             const txReceipt = await tx.wait(1)

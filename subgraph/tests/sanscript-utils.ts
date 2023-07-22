@@ -12,6 +12,7 @@ export function createAddedNewsletterEvent(
   image: string,
   title: string,
   description: string,
+  token: string,
   pricePerMonth: BigInt
 ): AddedNewsletter {
   let addedNewsletterEvent = changetype<AddedNewsletter>(newMockEvent())
@@ -42,6 +43,14 @@ export function createAddedNewsletterEvent(
       ethereum.Value.fromString(description)
     )
   )
+
+  addedNewsletterEvent.parameters.push(
+    new ethereum.EventParam(
+      "token",
+      ethereum.Value.fromAddress(Address.fromString(token))
+    )
+  )
+
   addedNewsletterEvent.parameters.push(
     new ethereum.EventParam(
       "pricePerMonth",

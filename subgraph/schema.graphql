@@ -12,6 +12,7 @@ type Newsletter @entity {
   image: String! # string
   title: String! # string
   description: String! # string
+  token: String!
   pricePerMonth: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!

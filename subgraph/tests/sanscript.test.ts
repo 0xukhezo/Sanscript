@@ -18,6 +18,7 @@ const newsletterNonce = 0
 let image = "QmeY1hzYDbwKGGbsQbPDX8bsWN8CgCtDnfUeMmpXJaTUea"
 let title = "Example new newsletter"
 let description = "Description example for new newsletter"
+let token = "0xd55c3f5961Ec1ff0eC1741eDa7bc2f5962c3c454"
 let pricePerMonth = BigInt.fromI32(10)
 
 describe("Describe entity assertions", () => {
@@ -29,6 +30,7 @@ describe("Describe entity assertions", () => {
       image,
       title,
       description,
+      token,
       pricePerMonth
     )
     handleAddedNewsletter(newAddedNewsletterEvent)
@@ -56,6 +58,7 @@ describe("Describe entity assertions", () => {
     assert.stringEquals(retrieveNewsletter!.image,image)
     assert.stringEquals(retrieveNewsletter!.title,title)
     assert.stringEquals(retrieveNewsletter!.description, description)
+    assert.stringEquals(retrieveNewsletter!.token, token.toLowerCase())
     assert.bigIntEquals(retrieveNewsletter!.pricePerMonth, pricePerMonth)
 
   })
