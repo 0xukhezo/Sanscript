@@ -112,9 +112,6 @@ function fillSchemaJsonDecode(
   newsletterOwner: string,
   newsletterNonce: string
 ) {
-  const nonceHexa = `0x${parseInt(newsletterNonce, 10)
-    .toString(16)
-    .padStart(2, "0")}`;
 
     const nonceHexa = `0x${parseInt(newsletterNonce, 10).toString(16).padStart(2, "0")}`
     console.log(nonceHexa)
