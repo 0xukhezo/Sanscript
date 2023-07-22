@@ -38,8 +38,8 @@ export default function NewNewsLetterForm({
   >();
   const [createSafeStatus, setCreateSafeStatus] = useState<boolean>(false);
 
-  const usdcfake = "0xBCc6f06b6d41732db56924A4B140fEa2d998F571";
-  const lockAddress = "0x727aEBCDF805905bcF80292109dc05eb485330B7";
+  const usdcfake = "0xd55c3f5961Ec1ff0eC1741eDa7bc2f5962c3c454";
+  const lockAddress = "0xA2D9E8F5A795bFd3153bc50846d5080ca218c5ab";
 
   const { isLoading: isLoadingApproveSafe } = useWaitForTransaction({
     hash: hashApproveSafe,
@@ -63,7 +63,6 @@ export default function NewNewsLetterForm({
               params: [txHash],
             });
             if (txReceipt) {
-              console.log(txReceipt);
               return txReceipt.status === "0x1";
             }
 
@@ -110,6 +109,7 @@ export default function NewNewsLetterForm({
               abi.usdcFake,
               signer
             );
+
             const tx = await erc20Contract.approve(
               lockAddress,
               ethers.utils.parseEther(price.toString()).toString()
@@ -173,7 +173,7 @@ export default function NewNewsLetterForm({
               ipfsLink,
               title,
               description,
-              price
+              ethers.utils.parseEther(price.toString()).toString()
             );
 
             setHashCreateSafe(tx.hash);
@@ -206,7 +206,7 @@ export default function NewNewsLetterForm({
             ipfsLink,
             title,
             description,
-            price
+            ethers.utils.parseEther(price.toString()).toString()
           );
           setHashCreateSafe(tx.hash);
 

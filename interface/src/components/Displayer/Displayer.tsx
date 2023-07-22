@@ -13,13 +13,14 @@ export default function Displayer({
 }: DisplayerInterface) {
   const [eoa, setEoa] = useState<string>("");
 
-  function shuffleArray(array: any) {
-    for (let i = array.length - 1; i > 0; i--) {
+  const shuffleArray = (arr: any[]): any[] => {
+    const newArr = Array.from(arr);
+    for (let i = newArr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+      [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
     }
-    return array;
-  }
+    return newArr;
+  };
 
   useEffect(() => {
     setEoa(localStorage.getItem("eoa") as string);
@@ -62,7 +63,7 @@ export default function Displayer({
               return (
                 <div
                   key={index}
-                  className="min-w-[270px] bg-gray-100 my-8 mr-7 rounded-lg text-center"
+                  className="max-w-[270px] bg-gray-100 my-8 mr-7 rounded-lg text-center"
                 >
                   <NewsLetterCard
                     image={newLetter.image}
@@ -83,7 +84,7 @@ export default function Displayer({
               return (
                 <div
                   key={index}
-                  className="min-w-[270px] bg-gray-100 my-8 mr-7 rounded-lg text-center"
+                  className="max-w-[270px] bg-gray-100 my-8 mr-7 rounded-lg text-center"
                 >
                   <NewsLetterCard
                     image={newLetter.image}

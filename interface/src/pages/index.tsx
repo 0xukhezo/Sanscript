@@ -2,9 +2,7 @@ import NavBar from "@/components/Layout/NavBar";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useAccount } from "wagmi";
 import Displayer from "../components/Displayer/Displayer";
-import { newsLettersTest } from "../testNewLetter/testNewLetter";
 import { client, NewsLetters } from "./api/Newsletters";
 import { HomeIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import CreateNewsLetterModal from "@/components/Modal/CreateNewsLetterModal";
@@ -44,7 +42,6 @@ type Icon = {
 };
 
 export default function Home() {
-  const { address } = useAccount();
   const [newsLetters, setNewsLetters] = useState<Object[]>([]);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [status, setStatus] = useState<boolean>(false);
@@ -56,29 +53,29 @@ export default function Home() {
 
   async function fetchNewsLetters() {
     const queryBody = `query {
-      AddedNewsletter {
-            id,
-            image,
-            newsletterOwner,
-            newsletterNonce,
-            title,
-            description,
-            pricePerMonth,
-            blockNumber,
-            blockTimestamp,
-            transactionHash
+      newsletters {
+        id
+        image
+        description
+        newsletterOwner {
+          id
+        }
+        pricePerMonth
+        title
         }
       }`;
 
     try {
       let response = await client.query({ query: NewsLetters(queryBody) });
-      setNewsLetters(response.data.AddedNewsletter);
-      // setNewsLettersOwned(
-      //   newsLettersTest.filter((newsLetter: any) => {
-      //     console.log(newsLetter.newsletterOwner);
-      //     newsLetter.newsletterOwner === address;
-      //   })
-      // );
+      setNewsLetters(response.data.newsletters);
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      setNewsLettersOwned(
+        response.data.newsletters.filter((newsLetter: any) => {
+          return newsLetter.newsletterOwner.id === accounts[0].toLowerCase();
+        })
+      );
     } catch (err) {
       console.log({ err });
     }
@@ -94,21 +91,26 @@ export default function Home() {
 
   const getFilteres = () => {
     const eoa = localStorage.getItem("eoa") as string;
-    const filteredOwnedNewsLetters = newsLettersTest.filter(
-      (newsLetter: any) => newsLetter.newsletterOwner === eoa
+    const filteredOwnedNewsLetters = newsLetters.filter(
+      (newsLetter: any) => newsLetter.newsletterOwner.id === eoa
     );
 
-    const filteredOtherNewsLetters = newsLettersTest.filter(
-      (newsLetter: any) => newsLetter.newsletterOwner !== eoa
+    const filteredOtherNewsLetters = newsLetters.filter(
+      (newsLetter: any) => newsLetter.newsletterOwner.id !== eoa
     );
 
     setNewsLettersOwned(filteredOwnedNewsLetters);
     setNewsLetters(filteredOtherNewsLetters);
+    setNewsLettersOwned(
+      newsLetters.filter((newsLetter: any) => {
+        return newsLetter.newsletterOwner.id === eoa.toLowerCase();
+      })
+    );
   };
 
   useEffect(() => {
     setEoa(localStorage.getItem("eoa") as string);
-
+    fetchNewsLetters();
     getFilteres();
   }, []);
 
@@ -161,15 +163,13 @@ export default function Home() {
                   +
                 </button>
               </div>
-              <div className="my-4 bg-grayStakingLinkHover p-4 rounded-xl">
+              <div>
                 {newsLettersOwned?.map((newLetter: any, index: number) => {
                   return (
-                    <Link
-                      href={`/${newLetter.title}`}
-                      className="text-2xl"
-                      key={index}
-                    >
-                      <div>{newLetter.title}</div>
+                    <Link href={`/${newLetter.title}`} key={index}>
+                      <div className="cardStakingHover my-4 bg-grayStakingLinkHover p-4 rounded-xl text-2xl">
+                        {newLetter.title}
+                      </div>
                     </Link>
                   );
                 })}
@@ -244,7 +244,7 @@ export default function Home() {
           <NavBar getStatus={getStatus} />
         </div>
         <div className="h-[790px] overflow-auto ml-10">
-          {newsLetters && newsLettersSubscribed && newsLettersOwned ? (
+          {newsLetters && newsLettersSubscribed ? (
             <Displayer
               newsLetters={newsLetters}
               newsLettersSubscribed={newsLettersSubscribed}
