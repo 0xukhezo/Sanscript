@@ -16,10 +16,8 @@ describe("sanscript.test", function () {
         const testERC20: TestERC20 = await testERC20Factory.deploy()
         await testERC20.mint(ethers.parseEther("1000"), account1.address)
 
-        console.log(process.env.SCHEMA_UID!)
-
         const Sanscript = await ethers.getContractFactory("Sanscript");
-        const sanscript = await Sanscript.deploy(testERC20.target, process.env.PRICE!, process.env.EAS_ADDRESS!, process.env.SCHEMA_UID!);
+        const sanscript = await Sanscript.deploy(testERC20.target, process.env.PRICE!, process.env.EAS_ADDRESS!, process.env.SCHEMA_UID!, process.env.WORLD_ID!, process.env.APP_ID!, process.env.ACTION_ID!);
 
         return { sanscript, testERC20, owner, account1, account2 };
     }

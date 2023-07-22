@@ -141,7 +141,8 @@ async function getMyNewslettersSubscription(address: string) {
 
 const easService = {
     generateAttestation,
-    getActivedSubscriptors
+    getActivedSubscriptors,
+    getMyNewslettersSubscription,
 };
 
 export default easService;

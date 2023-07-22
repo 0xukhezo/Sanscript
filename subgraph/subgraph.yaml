@@ -6,9 +6,9 @@ dataSources:
     name: Sanscript
     network: sepolia
     source:
-      address: "0xA2D9E8F5A795bFd3153bc50846d5080ca218c5ab"
+      address: "0x5afbf4501e70cF5D24bD9a5aCDEe66DdCAf33136"
       abi: Sanscript
-      startBlock: 3938989
+      startBlock: 3942689
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
