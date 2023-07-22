@@ -21,9 +21,9 @@ const INFURA_KEY = process.env.NEXT_PUBLIC_INFURA_KEY;
 export default function NewNewsLetterForm({
   getSuccess,
 }: NewNewsLetterFormProps) {
-  const [ipfsLink, setIpfsLink] = useState<string>(" ");
-  const [description, setDescription] = useState<string>(" ");
-  const [title, setTitle] = useState<string>(" ");
+  const [ipfsLink, setIpfsLink] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [title, setTitle] = useState<string>("");
   const [price, setPrice] = useState<number>(10);
   const [conexionType, setConexionType] = useState<string | null>("");
   const [web3AuthModalPack, setWeb3AuthModalPack] =
