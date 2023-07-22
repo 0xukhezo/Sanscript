@@ -164,8 +164,8 @@ export default function NavBar({ getStatus }: NavBarProps) {
     <main
       className={
         router.pathname === "/"
-          ? "flex justify-end py-6 px-6 items-center text-darkText bg-darkBackground z-50 rounded-xl"
-          : "flex justify-end py-6 px-6 items-center text-darkText bg-darkBackground"
+          ? "flex justify-end pt-6 pb-3 px-6 items-center text-darkText bg-darkBackground z-50 rounded-xl"
+          : "flex justify-end pt-6 pb-3 px-6 items-center text-darkText bg-darkBackground"
       }
     >
       <div>
@@ -179,14 +179,17 @@ export default function NavBar({ getStatus }: NavBarProps) {
             <div className="px-4">
               <EthHashInfo address={safeAuthSignInResponse?.eoa || eoa} />
             </div>
-            <button onClick={logout} className="px-4 py-2 bg-main rounded-lg">
+            <button onClick={logout} className="px-4 py-2 bg-main rounded-full">
               Log Out
             </button>
           </div>
         ) : (
           <div className="flex items-center">
-            <button onClick={login} className="px-4 py-2 bg-main rounded-lg">
-              Login
+            <button
+              onClick={login}
+              className="px-4 py-2 bg-darkText rounded-full text-lightText"
+            >
+              Connect to App
             </button>
           </div>
         )}

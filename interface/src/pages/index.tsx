@@ -11,14 +11,12 @@ import CreateNewsLetterModal from "@/components/Modal/CreateNewsLetterModal";
 import MediumDark from "../../public/MediumDark.svg";
 import GithubDark from "../../public/GithubDark.svg";
 import LensDark from "../../public/LensDark.svg";
-import TelegramDark from "../../public/TelegramDark.svg";
 import TwitterDark from "../../public/TwitterDark.svg";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 const twitterImgDark = { TwitterDark };
 const githubImgDark = { GithubDark };
 const lensImgDark = { LensDark };
-const telegramImgDark = { TelegramDark };
 const mediumImgDark = { MediumDark };
 
 const iconsFooterDark = [
@@ -32,10 +30,6 @@ const iconsFooterDark = [
   },
   {
     img: lensImgDark.LensDark.src,
-    href: "",
-  },
-  {
-    img: telegramImgDark.TelegramDark.src,
     href: "",
   },
   {
@@ -98,10 +92,8 @@ export default function Home() {
     setStatus(statusNavbar);
   };
 
-  useEffect(() => {
-    setEoa(localStorage.getItem("eoa") as string);
+  const getFilteres = () => {
     const eoa = localStorage.getItem("eoa") as string;
-
     const filteredOwnedNewsLetters = newsLettersTest.filter(
       (newsLetter: any) => newsLetter.newsletterOwner === eoa
     );
@@ -112,36 +104,24 @@ export default function Home() {
 
     setNewsLettersOwned(filteredOwnedNewsLetters);
     setNewsLetters(filteredOtherNewsLetters);
+  };
+
+  useEffect(() => {
+    setEoa(localStorage.getItem("eoa") as string);
+
+    getFilteres();
   }, []);
 
   useEffect(() => {
-    const filteredOwnedNewsLetters = newsLettersTest.filter(
-      (newsLetter: any) => newsLetter.newsletterOwner === eoa
-    );
-
-    const filteredOtherNewsLetters = newsLettersTest.filter(
-      (newsLetter: any) => newsLetter.newsletterOwner !== eoa
-    );
-
-    setNewsLettersOwned(filteredOwnedNewsLetters);
-    setNewsLetters(filteredOtherNewsLetters);
-  }, [eoa]);
+    getFilteres();
+  }, [eoa, status]);
 
   useEffect(() => {
-    const filteredOwnedNewsLetters = newsLettersTest.filter(
-      (newsLetter: any) => newsLetter.newsletterOwner === eoa
-    );
-
-    const filteredOtherNewsLetters = newsLettersTest.filter(
-      (newsLetter: any) => newsLetter.newsletterOwner !== eoa
-    );
-
-    setNewsLettersOwned(filteredOwnedNewsLetters);
-    setNewsLetters(filteredOtherNewsLetters);
-  }, [address]);
-
-  useEffect(() => {
-    setEoa(localStorage.getItem("eoa") as string);
+    if (status) {
+      setEoa(localStorage.getItem("eoa") as string);
+    } else {
+      setEoa(localStorage.getItem("eoa") as string);
+    }
   }, [status]);
 
   return (
@@ -222,14 +202,40 @@ export default function Home() {
             </section>
           )}
           <div className="m-4">
-            <div className="mb-3 p-2 rounded-full border-1 border-white w-fit flex items-center">
-              <ChevronDownIcon
-                className="h-4 w-4 text-white"
-                aria-hidden="true"
-              />
-              <span className="ml-2">Spanish</span>
+            <div className="flex flex-row items-center">
+              <div className="mb-3 p-2 rounded-full border-1 border-white w-fit flex items-center">
+                <ChevronDownIcon
+                  className="h-4 w-4 text-white"
+                  aria-hidden="true"
+                />
+                <span className="ml-2">Spanish</span>
+              </div>
+              <div className="font-light text-sm mb-2 ml-2">
+                <span className="mx-2">The team</span>
+                <span className="mx-2">Github</span>
+                <span className="mx-2">Join Discord</span>
+              </div>
             </div>
-            <div className="font-light">Developed on ETH Global Paris</div>
+            <div className="my-4 flex justify-between">
+              <div className="font-light text-sm">
+                Developed on ETH Global Paris
+              </div>
+              <div className="flex flex-row">
+                {iconsFooterDark.map((icon: Icon, index: number) => {
+                  return (
+                    <a href={icon.href} target="_blank" key={index}>
+                      <Image
+                        width={17}
+                        height={17}
+                        alt="Token Image"
+                        src={icon.img}
+                        className="mr-3"
+                      />
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -246,23 +252,6 @@ export default function Home() {
           ) : (
             <div>Loading...</div>
           )}
-        </div>
-        <div className="mx-20 my-4 flex justify-end">
-          <div className="flex flex-row">
-            {iconsFooterDark.map((icon: Icon, index: number) => {
-              return (
-                <a href={icon.href} target="_blank" key={index}>
-                  <Image
-                    width={24}
-                    height={24}
-                    alt="Token Image"
-                    src={icon.img}
-                    className="mr-9 mb-10 z-10"
-                  />
-                </a>
-              );
-            })}
-          </div>
         </div>
       </section>{" "}
       {openModal && <CreateNewsLetterModal getOpenModal={getOpenModal} />}

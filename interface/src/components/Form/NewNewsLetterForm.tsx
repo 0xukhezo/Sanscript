@@ -6,10 +6,10 @@ import detectEthereumProvider from "@metamask/detect-provider";
 import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import { Web3AuthOptions } from "@web3auth/modal";
-import { MetaMaskSDK } from "@metamask/sdk";
 
 import { create } from "ipfs-http-client";
 import { Web3AuthModalPack } from "../../utils";
+import Loader from "../Loader/Loader";
 
 interface NewNewsLetterFormProps {
   getSuccess: (state: boolean) => void;
@@ -58,10 +58,11 @@ export default function NewNewsLetterForm({
         if (!txReceipt) {
           await new Promise((resolve) => setTimeout(resolve, 10000));
         } else {
+          console.log(txReceipt);
           return txReceipt.status;
         }
       } catch (error) {
-        console.error("Error al obtener el recibo de la transacción:", error);
+        console.error("Error obtaining the tx receipt", error);
         break;
       }
     }
@@ -76,7 +77,6 @@ export default function NewNewsLetterForm({
               web3AuthModalPack?.getProvider()!
             );
             const signer = provider.getSigner();
-            console.log(signer);
             const erc20Contract = new ethers.Contract(
               usdcfake,
               abi.usdcFake,
@@ -112,7 +112,7 @@ export default function NewNewsLetterForm({
           abi.usdcFake,
           signer
         );
-        console.log(erc20Contract);
+
         const tx = await erc20Contract.approve(
           lockAddress,
           ethers.utils.parseEther(price.toString()).toString()
@@ -195,6 +195,8 @@ export default function NewNewsLetterForm({
 
   useEffect(() => {
     (async () => {
+      const provider = await detectEthereumProvider();
+      console.log(provider);
       const type = localStorage.getItem("Web3Auth-cachedAdapter");
       setConexionType(type);
       const options: Web3AuthOptions = {
@@ -250,8 +252,8 @@ export default function NewNewsLetterForm({
   }, []);
 
   useEffect(() => {
-    getSuccess(approveSafeStatus);
-  }, [approveSafeStatus]);
+    getSuccess(isLoadingCreateSafe);
+  }, [approveSafeStatus, createSafeStatus]);
 
   async function handleImageUpload(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -344,8 +346,9 @@ export default function NewNewsLetterForm({
       </div>
       {approveSafeStatus ? (
         isLoadingCreateSafe && !createSafeStatus ? (
-          <button className="px-10 py-2 bg-main rounded-lg flex mx-auto text-lightText">
-            Creating
+          <button className="px-10 py-2 bg-main rounded-lg flex mx-auto text-lightText items-center">
+            <span className="mr-2">Creating...</span>
+            <Loader />
           </button>
         ) : (
           <button
@@ -356,8 +359,9 @@ export default function NewNewsLetterForm({
           </button>
         )
       ) : isLoadingApproveSafe && !approveSafeStatus ? (
-        <button className="px-10 py-2 bg-main rounded-lg flex mx-auto text-lightText">
-          Approving
+        <button className="px-10 py-2 bg-main rounded-lg flex mx-auto text-lightText items-center">
+          <span className="mr-2">Approving...</span>
+          <Loader />
         </button>
       ) : (
         <button

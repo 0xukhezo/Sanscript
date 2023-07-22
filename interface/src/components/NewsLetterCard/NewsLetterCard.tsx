@@ -19,22 +19,23 @@ function NewsLetterCard({
   price,
 }: NewsLetterCardProps) {
   return (
-    <article
-      key={title}
-      className="cardStakingHover flex flex-col items-start justify-between z-10"
-    >
+    <article key={title} className="cardStakingHover rounded-lg relative">
       <Link href={`/${title}`}>
-        <div className="relative w-full max-h-[100px">
-          <ImageIpfsDisplay cid={image} />
-          <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-gray-900/10" />
-        </div>
-        <div className="max-w-xl text-start px-2">
+        {" "}
+        <p className="text-main absolute top-0 right-0 mr-3 mt-1 font-extrelight text-sm bg-cardGradientDark px-2 rounded-full">
+          <span className="mr-0.5">$</span>{" "}
+          <span>
+            {ethers.utils.formatUnits(price.toString(), "18").toString()}
+          </span>
+        </p>
+        <ImageIpfsDisplay cid={image} />
+        <div className="bg-cardGradientDark text-start px-4 rounded-b-lg">
           <div className="group relative">
-            <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-              <span className="absolute inset-0" />
+            <h3 className="pt-4 text-lg font-semibold leading-6">
+              <span className="absolute inset-0 text-white font-medium" />
               {title}
             </h3>
-            <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">
+            <p className="mt-3 line-clamp-3 text-sm leading-6 text-gray-400 font-light">
               {description}
             </p>
           </div>
