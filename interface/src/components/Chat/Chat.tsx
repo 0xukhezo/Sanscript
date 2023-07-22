@@ -82,7 +82,7 @@ export default function Chat({
       <div>
         <MessageList messages={messageHistory} />
       </div>
-      {newsLetter.newsletterOwner.id === eoa.toLowerCase() && (
+      {newsLetter.newsletterOwner.id === eoa?.toLowerCase() && (
         <>
           <div className="w-full flex mt-8">
             <Editor
