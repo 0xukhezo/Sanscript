@@ -11,9 +11,10 @@ import { InjectedConnector } from "@wagmi/core";
 import { useConnect } from "wagmi";
 import { AuthKitSignInData, Web3AuthModalPack } from "../../utils";
 
-import { BellIcon } from "@heroicons/react/24/outline";
+import { BellIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { EmbedSDK } from "@pushprotocol/uiembed";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 const WEB3AUTH_CLIENT_ID = process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID;
 const INFURA_KEY = process.env.NEXT_PUBLIC_INFURA_KEY;
@@ -163,14 +164,23 @@ export default function NavBar({ getStatus }: NavBarProps) {
   return (
     <main
       className={
-        router.pathname === "/"
-          ? "flex justify-end pt-6 pb-3 px-6 items-center text-darkText bg-darkBackground z-50 rounded-xl"
-          : "flex justify-end pt-6 pb-3 px-6 items-center text-darkText bg-darkBackground"
+        router.pathname !== "/"
+          ? "flex justify-between pt-6 pb-3 px-6 items-center text-darkText bg-darkBackground z-50 rounded-xl"
+          : "flex justify-end pt-6 pb-3 px-6 items-center text-darkText bg-darkBackground z-50 rounded-xl"
       }
     >
+      {router.pathname !== "/" && (
+        <Link className="flex items-center text-xl" href="/">
+          <ChevronLeftIcon
+            className="h-4 w-4 text-white mt-0.5"
+            aria-hidden="true"
+          />
+          <span>Back</span>
+        </Link>
+      )}
       <div>
         {eoa || safeAuthSignInResponse?.eoa ? (
-          <div className="flex justify-between items-center">
+          <div className="flex  items-center">
             <div className="flex items-center">
               <button id="sdk-trigger-id">
                 <BellIcon className="h-6 w-6 text-main" aria-hidden="true" />
