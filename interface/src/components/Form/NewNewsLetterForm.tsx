@@ -212,6 +212,7 @@ export default function NewNewsLetterForm({
             ipfsLink,
             title,
             description,
+            usdcfake,
             ethers.utils.parseEther(price.toString()).toString()
           );
           setHashCreateSafe(tx.hash);

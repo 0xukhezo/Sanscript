@@ -45,6 +45,7 @@ export default function Displayer({
                   >
                     <NewsLetterCard
                       image={newLetter.image}
+                      id={newLetter.id}
                       owner={newLetter.newsletterOwner}
                       title={newLetter.title}
                       description={newLetter.description}
@@ -67,6 +68,7 @@ export default function Displayer({
                 >
                   <NewsLetterCard
                     image={newLetter.image}
+                    id={newLetter.id}
                     owner={newLetter.newsletterOwner}
                     title={newLetter.title}
                     description={newLetter.description}
@@ -88,6 +90,7 @@ export default function Displayer({
                 >
                   <NewsLetterCard
                     image={newLetter.image}
+                    id={newLetter.id}
                     owner={newLetter.newsletterOwner}
                     title={newLetter.title}
                     description={newLetter.description}

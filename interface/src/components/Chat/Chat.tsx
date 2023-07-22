@@ -82,13 +82,13 @@ export default function Chat({
       <div>
         <MessageList messages={messageHistory} />
       </div>
-      {newsLetter.newsletterOwner.id === eoa && (
+      {newsLetter.newsletterOwner.id === eoa.toLowerCase() && (
         <>
           <div className="w-full flex mt-8">
             <Editor
               value={inputValue}
               onTextChange={(e) => setInputValue(e.htmlValue as string)}
-              style={{ height: "320px", width: "1580px" }}
+              style={{ height: "320px", width: "1130px" }}
             />{" "}
           </div>
           <div className="mx-auto mt-10">
