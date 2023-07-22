@@ -1,7 +1,7 @@
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 
 const API_URL =
-  "https://api.studio.thegraph.com/query/45707/treasurydao/version/latest";
+  "https://api.studio.thegraph.com/query/50131/sanscript/version/latest";
 
 export const client = new ApolloClient({
   uri: API_URL,

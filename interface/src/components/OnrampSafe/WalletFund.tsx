@@ -31,8 +31,6 @@ function WalletFund() {
         recipient: "0xA4a3aC7cBA6B584c674737e7a04d760433147287", //TODO
       }
     );
-
-    console.log(eventData);
   };
 
   const fundWallet = async () => {
@@ -57,8 +55,6 @@ function WalletFund() {
         onPaymentProcessing: () => console.log("Payment processing"),
       },
     });
-
-    console.log({ sessionData });
   };
 
   return (
