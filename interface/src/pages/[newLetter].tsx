@@ -90,57 +90,6 @@ export default function NewLetter() {
   const usdcfake = "0xd55c3f5961Ec1ff0eC1741eDa7bc2f5962c3c454";
   const lockAddress = "0x7Af80E3881E7ECfCeEb4EeA7039B72579afFf7FD";
 
-  const test = [
-    {
-      id: "0xE6307e57dd7A85843E396Ad0bedde0d462ad861b_40",
-      image: "QmVc4gxnNLkGRuxpnaFVB5UQhqPUdqEHiSxMAWTLdBQydW",
-      description:
-        "Get the early bird access to the latest updates in the Push Protocol. This is a dummy text: But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful.",
-      newsletterOwner: {
-        id: "0xE6307e57dd7A85843E396Ad0bedde0d462ad861b",
-      },
-      pricePerMonth: "4990000000000000000",
-      title: "Push Protocol",
-      newsletterNonce: 40,
-    },
-    {
-      id: "0x8Ecf45B0f35f72907Ef2269118F5768a9Fa16be9_40",
-      image: "QmectoXTgDCTAJrccdkiVXBhSzvowvpMkxUAxUzbnvtvXg",
-      description:
-        "Get exclusive access to the latest improvements in this newsletter. Make sure you don't miss anything.This is a dummy text: But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful.",
-      newsletterOwner: {
-        id: "0x8Ecf45B0f35f72907Ef2269118F5768a9Fa16be9",
-      },
-      pricePerMonth: "9990000000000000000",
-      title: "The Graph",
-      newsletterNonce: 40,
-    },
-    {
-      id: "0x624981477F92758702D4BFc92742bD25337Bd801_40",
-      image: "QmfYAin7E5dF96uWfKfj9JkxC9HU1M4WarfEAzFrwNMgXM",
-      description:
-        "In this newsletter you will get early access to new functionalities. This is a dummy text: But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful.",
-      newsletterOwner: {
-        id: "0x624981477F92758702D4BFc92742bD25337Bd801",
-      },
-      pricePerMonth: "3990000000000000000",
-      title: "Safe Protocol",
-      newsletterNonce: 40,
-    },
-    {
-      id: "0x371Ecb716cccBE0EA88EC89ebE09006d575eEa52_40",
-      image: "QmTP9RSztWVP4Ezo2Kh88o6tVFzoNgHWTTzfSVSeo3qCLs",
-      description:
-        "Get exclusive updates about any update we make. Secret event locations and much more. This is a dummy text: But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful.",
-      newsletterOwner: {
-        id: "0x371Ecb716cccBE0EA88EC89ebE09006d575eEa52",
-      },
-      pricePerMonth: "9990000000000000000",
-      title: "APE Coin",
-      newsletterNonce: 40,
-    },
-  ];
-
   async function fetchNewsletterSuscriptor() {
     if (router) {
       const route = router.query.newLetter as string;
