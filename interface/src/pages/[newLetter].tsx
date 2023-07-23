@@ -734,7 +734,16 @@ export default function NewLetter() {
               )}
             </div>
           ) : (
-            <div>Loading</div>
+            <div className="h-full">
+              {" "}
+              <Image
+                src={Logo.Logo1.src}
+                height={200}
+                width={200}
+                alt="Logo Image"
+                className="h-full mx-auto my-auto animate-pulse"
+              />
+            </div>
           )}
         </section>{" "}
         {openModal && <CreateNewsLetterModal getOpenModal={getOpenModal} />}
