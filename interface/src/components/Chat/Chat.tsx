@@ -87,7 +87,7 @@ export default function Chat({
   useEffect(() => {
     setEoa(localStorage.getItem("eoa") as string);
   }, [eoa]);
-  console.log(newsLetter.newsletterOwner.id === eoa?.toLowerCase());
+
   return (
     <div>
       <div>

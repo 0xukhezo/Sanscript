@@ -16,15 +16,6 @@ export default function Displayer({
 }: DisplayerInterface) {
   const [eoa, setEoa] = useState<string>("");
 
-  const shuffleArray = (arr: any[]): any[] => {
-    const newArr = Array.from(arr);
-    for (let i = newArr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
-    }
-    return newArr;
-  };
-
   useEffect(() => {
     setEoa(localStorage.getItem("eoa") as string);
   }, []);
@@ -86,25 +77,23 @@ export default function Displayer({
           <section className="mx-10 mb-10 mt-4">
             <h2 className="text-4xl">Oldies but goodies</h2>
             <div className="flex flex-row overflow-auto max-w-[1200px]">
-              {shuffleArray(newsLetters).map(
-                (newLetter: any, index: number) => {
-                  return (
-                    <div
-                      key={index}
-                      className="min-w-[270px] bg-gray-100 my-8 mr-7 rounded-lg text-center"
-                    >
-                      <NewsLetterCard
-                        image={newLetter.image}
-                        id={newLetter.id}
-                        owner={newLetter.newsletterOwner}
-                        title={newLetter.title}
-                        description={newLetter.description}
-                        price={newLetter.pricePerMonth}
-                      />
-                    </div>
-                  );
-                }
-              )}
+              {newsLetters.map((newLetter: any, index: number) => {
+                return (
+                  <div
+                    key={index}
+                    className="min-w-[270px] bg-gray-100 my-8 mr-7 rounded-lg text-center"
+                  >
+                    <NewsLetterCard
+                      image={newLetter.image}
+                      id={newLetter.id}
+                      owner={newLetter.newsletterOwner}
+                      title={newLetter.title}
+                      description={newLetter.description}
+                      price={newLetter.pricePerMonth}
+                    />
+                  </div>
+                );
+              })}
             </div>
           </section>{" "}
         </div>

@@ -49,7 +49,7 @@ export default function NewNewsLetterForm({
   const [createSafeStatus, setCreateSafeStatus] = useState<boolean>(false);
 
   const usdcfake = "0xd55c3f5961Ec1ff0eC1741eDa7bc2f5962c3c454";
-  const lockAddress = "0x5726E5Fe247214DC0f1C2a9e590550B00962f87f";
+  const lockAddress = "0x7Af80E3881E7ECfCeEb4EeA7039B72579afFf7FD";
 
   const { isLoading: isLoadingApproveSafe } = useWaitForTransaction({
     hash: hashApproveSafe,
@@ -311,6 +311,7 @@ export default function NewNewsLetterForm({
         const blob = new Blob([file]);
         const addedFile = await ipfs.add(blob);
         const cid = addedFile.cid.toString();
+
         setIpfsLink(cid);
       } catch (error) {
         console.error("Error al subir la imagen a IPFS:", error);
