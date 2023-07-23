@@ -1,0 +1,11 @@
+# .graphclientrc.yml
+sources:
+  - name: sanscript
+    handler:
+      graphql:
+        endpoint: https://api.studio.thegraph.com/query/50131/sanscript/v0.0.4
+documents:
+  - ./src/queries.graphql
+plugins:
+  - pollingLive:
+      defaultInterval: 3000
