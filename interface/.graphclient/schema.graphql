@@ -1,0 +1,420 @@
+schema {
+  query: Query
+  subscription: Subscription
+}
+
+"Marks the GraphQL type as indexable entity.  Each type that should be an entity is required to be annotated with this directive."
+directive @entity on OBJECT
+
+"Defined a Subgraph ID for an object type"
+directive @subgraphId(id: String!) on OBJECT
+
+"creates a virtual field on the entity that may be queried but cannot be set manually through the mappings API."
+directive @derivedFrom(field: String!) on FIELD_DEFINITION
+
+scalar BigDecimal
+
+scalar BigInt
+
+input BlockChangedFilter {
+  number_gte: Int!
+}
+
+input Block_height {
+  hash: Bytes
+  number: Int
+  number_gte: Int
+}
+
+scalar Bytes
+
+"""
+8 bytes signed integer
+
+"""
+scalar Int8
+
+type Newsletter {
+  id: ID!
+  newsletterOwner: Owner!
+  newsletterNonce: Int!
+  image: String!
+  title: String!
+  description: String!
+  token: String!
+  pricePerMonth: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+input Newsletter_filter {
+  id: ID
+  id_not: ID
+  id_gt: ID
+  id_lt: ID
+  id_gte: ID
+  id_lte: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  newsletterOwner: String
+  newsletterOwner_not: String
+  newsletterOwner_gt: String
+  newsletterOwner_lt: String
+  newsletterOwner_gte: String
+  newsletterOwner_lte: String
+  newsletterOwner_in: [String!]
+  newsletterOwner_not_in: [String!]
+  newsletterOwner_contains: String
+  newsletterOwner_contains_nocase: String
+  newsletterOwner_not_contains: String
+  newsletterOwner_not_contains_nocase: String
+  newsletterOwner_starts_with: String
+  newsletterOwner_starts_with_nocase: String
+  newsletterOwner_not_starts_with: String
+  newsletterOwner_not_starts_with_nocase: String
+  newsletterOwner_ends_with: String
+  newsletterOwner_ends_with_nocase: String
+  newsletterOwner_not_ends_with: String
+  newsletterOwner_not_ends_with_nocase: String
+  newsletterOwner_: Owner_filter
+  newsletterNonce: Int
+  newsletterNonce_not: Int
+  newsletterNonce_gt: Int
+  newsletterNonce_lt: Int
+  newsletterNonce_gte: Int
+  newsletterNonce_lte: Int
+  newsletterNonce_in: [Int!]
+  newsletterNonce_not_in: [Int!]
+  image: String
+  image_not: String
+  image_gt: String
+  image_lt: String
+  image_gte: String
+  image_lte: String
+  image_in: [String!]
+  image_not_in: [String!]
+  image_contains: String
+  image_contains_nocase: String
+  image_not_contains: String
+  image_not_contains_nocase: String
+  image_starts_with: String
+  image_starts_with_nocase: String
+  image_not_starts_with: String
+  image_not_starts_with_nocase: String
+  image_ends_with: String
+  image_ends_with_nocase: String
+  image_not_ends_with: String
+  image_not_ends_with_nocase: String
+  title: String
+  title_not: String
+  title_gt: String
+  title_lt: String
+  title_gte: String
+  title_lte: String
+  title_in: [String!]
+  title_not_in: [String!]
+  title_contains: String
+  title_contains_nocase: String
+  title_not_contains: String
+  title_not_contains_nocase: String
+  title_starts_with: String
+  title_starts_with_nocase: String
+  title_not_starts_with: String
+  title_not_starts_with_nocase: String
+  title_ends_with: String
+  title_ends_with_nocase: String
+  title_not_ends_with: String
+  title_not_ends_with_nocase: String
+  description: String
+  description_not: String
+  description_gt: String
+  description_lt: String
+  description_gte: String
+  description_lte: String
+  description_in: [String!]
+  description_not_in: [String!]
+  description_contains: String
+  description_contains_nocase: String
+  description_not_contains: String
+  description_not_contains_nocase: String
+  description_starts_with: String
+  description_starts_with_nocase: String
+  description_not_starts_with: String
+  description_not_starts_with_nocase: String
+  description_ends_with: String
+  description_ends_with_nocase: String
+  description_not_ends_with: String
+  description_not_ends_with_nocase: String
+  token: String
+  token_not: String
+  token_gt: String
+  token_lt: String
+  token_gte: String
+  token_lte: String
+  token_in: [String!]
+  token_not_in: [String!]
+  token_contains: String
+  token_contains_nocase: String
+  token_not_contains: String
+  token_not_contains_nocase: String
+  token_starts_with: String
+  token_starts_with_nocase: String
+  token_not_starts_with: String
+  token_not_starts_with_nocase: String
+  token_ends_with: String
+  token_ends_with_nocase: String
+  token_not_ends_with: String
+  token_not_ends_with_nocase: String
+  pricePerMonth: BigInt
+  pricePerMonth_not: BigInt
+  pricePerMonth_gt: BigInt
+  pricePerMonth_lt: BigInt
+  pricePerMonth_gte: BigInt
+  pricePerMonth_lte: BigInt
+  pricePerMonth_in: [BigInt!]
+  pricePerMonth_not_in: [BigInt!]
+  blockNumber: BigInt
+  blockNumber_not: BigInt
+  blockNumber_gt: BigInt
+  blockNumber_lt: BigInt
+  blockNumber_gte: BigInt
+  blockNumber_lte: BigInt
+  blockNumber_in: [BigInt!]
+  blockNumber_not_in: [BigInt!]
+  blockTimestamp: BigInt
+  blockTimestamp_not: BigInt
+  blockTimestamp_gt: BigInt
+  blockTimestamp_lt: BigInt
+  blockTimestamp_gte: BigInt
+  blockTimestamp_lte: BigInt
+  blockTimestamp_in: [BigInt!]
+  blockTimestamp_not_in: [BigInt!]
+  transactionHash: Bytes
+  transactionHash_not: Bytes
+  transactionHash_gt: Bytes
+  transactionHash_lt: Bytes
+  transactionHash_gte: Bytes
+  transactionHash_lte: Bytes
+  transactionHash_in: [Bytes!]
+  transactionHash_not_in: [Bytes!]
+  transactionHash_contains: Bytes
+  transactionHash_not_contains: Bytes
+  """Filter for the block changed event."""
+  _change_block: BlockChangedFilter
+  and: [Newsletter_filter]
+  or: [Newsletter_filter]
+}
+
+enum Newsletter_orderBy {
+  id
+  newsletterOwner
+  newsletterOwner__id
+  newsletterOwner__newslettersAmount
+  newsletterOwner__isVerifiedHuman
+  newsletterNonce
+  image
+  title
+  description
+  token
+  pricePerMonth
+  blockNumber
+  blockTimestamp
+  transactionHash
+}
+
+"""Defines the order direction, either ascending or descending"""
+enum OrderDirection {
+  asc
+  desc
+}
+
+type Owner {
+  id: ID!
+  newsletters(skip: Int = 0, first: Int = 100, orderBy: Newsletter_orderBy, orderDirection: OrderDirection, where: Newsletter_filter): [Newsletter!]
+  newslettersAmount: BigInt!
+  isVerifiedHuman: Boolean!
+}
+
+input Owner_filter {
+  id: ID
+  id_not: ID
+  id_gt: ID
+  id_lt: ID
+  id_gte: ID
+  id_lte: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  newsletters_: Newsletter_filter
+  newslettersAmount: BigInt
+  newslettersAmount_not: BigInt
+  newslettersAmount_gt: BigInt
+  newslettersAmount_lt: BigInt
+  newslettersAmount_gte: BigInt
+  newslettersAmount_lte: BigInt
+  newslettersAmount_in: [BigInt!]
+  newslettersAmount_not_in: [BigInt!]
+  isVerifiedHuman: Boolean
+  isVerifiedHuman_not: Boolean
+  isVerifiedHuman_in: [Boolean!]
+  isVerifiedHuman_not_in: [Boolean!]
+  """Filter for the block changed event."""
+  _change_block: BlockChangedFilter
+  and: [Owner_filter]
+  or: [Owner_filter]
+}
+
+enum Owner_orderBy {
+  id
+  newsletters
+  newslettersAmount
+  isVerifiedHuman
+}
+
+type Query {
+  owner(
+    id: ID!
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Owner
+  owners(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Owner_orderBy
+    orderDirection: OrderDirection
+    where: Owner_filter
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Owner!]!
+  newsletter(
+    id: ID!
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Newsletter
+  newsletters(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Newsletter_orderBy
+    orderDirection: OrderDirection
+    where: Newsletter_filter
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Newsletter!]!
+  """Access to subgraph metadata"""
+  _meta(block: Block_height): _Meta_
+}
+
+type Subscription {
+  owner(
+    id: ID!
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Owner
+  owners(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Owner_orderBy
+    orderDirection: OrderDirection
+    where: Owner_filter
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Owner!]!
+  newsletter(
+    id: ID!
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Newsletter
+  newsletters(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Newsletter_orderBy
+    orderDirection: OrderDirection
+    where: Newsletter_filter
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Newsletter!]!
+  """Access to subgraph metadata"""
+  _meta(block: Block_height): _Meta_
+}
+
+type _Block_ {
+  """The hash of the block"""
+  hash: Bytes
+  """The block number"""
+  number: Int!
+  """Integer representation of the timestamp stored in blocks for the chain"""
+  timestamp: Int
+}
+
+"""The type for the top-level _meta field"""
+type _Meta_ {
+  """
+  Information about a specific subgraph block. The hash of the block
+  will be null if the _meta field has a block constraint that asks for
+  a block number. It will be filled if the _meta field has no block constraint
+  and therefore asks for the latest  block
+  
+  """
+  block: _Block_!
+  """The deployment ID"""
+  deployment: String!
+  """If `true`, the subgraph encountered indexing errors at some past block"""
+  hasIndexingErrors: Boolean!
+}
+
+enum _SubgraphErrorPolicy_ {
+  """Data will be returned even if the subgraph has indexing errors"""
+  allow
+  """
+  If the subgraph has indexing errors, data will be omitted. The default.
+  """
+  deny
+}
