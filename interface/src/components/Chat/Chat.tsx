@@ -24,10 +24,10 @@ export default function Chat({
       await onSendMessage(inputValue);
 
       await axios.post("http://localhost:3001/api/v1/newsletter/push", {
-        addresses: inputValue,
+        addresses: subscriptors,
         owner: newsLetter.newsletterOwner,
         newsletterTitle: newsLetter.title,
-        newsletterText: inputValue.substring(0,130).concat("...")
+        newsletterText: inputValue.substring(0, 130).concat("..."),
       });
 
       setInputValue("");
@@ -87,7 +87,7 @@ export default function Chat({
   useEffect(() => {
     setEoa(localStorage.getItem("eoa") as string);
   }, [eoa]);
-
+  console.log(newsLetter.newsletterOwner.id === eoa?.toLowerCase());
   return (
     <div>
       <div>

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useWaitForTransaction } from "wagmi";
 import detectEthereumProvider from "@metamask/detect-provider";
 import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
+import { IDKitWidget } from "@worldcoin/idkit";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import { Web3AuthOptions } from "@web3auth/modal";
 import apeCoin1 from "../../../public/Apecoin.svg";
@@ -13,6 +14,9 @@ import { create } from "ipfs-http-client";
 import { Web3AuthModalPack } from "../../utils";
 import Loader from "../Loader/Loader";
 import Toggled from "../Toggled/Toggled";
+import Woldcoin1 from "../../../public/Woldcoin.svg";
+
+const Woldcoin = { Woldcoin1 };
 
 interface NewNewsLetterFormProps {
   getSuccess: (state: boolean) => void;
@@ -29,6 +33,7 @@ export default function NewNewsLetterForm({
   const [ipfsLink, setIpfsLink] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [title, setTitle] = useState<string>("");
+  const [worldCoin, setWorldCoin] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(10.99);
   const [conexionType, setConexionType] = useState<string | null>("");
   const [web3AuthModalPack, setWeb3AuthModalPack] =
@@ -402,32 +407,57 @@ export default function NewNewsLetterForm({
           className=" px-4 block w-full border-black rounded-lg  my-4 border-2 py-1.5 text-gray-900  placeholder:text-gray-400 sm:text-sm sm:leading-6"
         />
       </div>
-      {approveSafeStatus ? (
-        isLoadingCreateSafe && !createSafeStatus ? (
+      {worldCoin ? (
+        approveSafeStatus ? (
+          isLoadingCreateSafe && !createSafeStatus ? (
+            <button className="px-10 py-2 bg-main rounded-lg flex mx-auto text-white items-center">
+              <span className="mr-2">Creating...</span>
+              <Loader />
+            </button>
+          ) : (
+            <button
+              className="px-10 py-2 bg-main rounded-lg flex mx-auto text-white"
+              onClick={() => onCreateNewsLetterClick()}
+            >
+              Create!
+            </button>
+          )
+        ) : isLoadingApproveSafe && !approveSafeStatus ? (
           <button className="px-10 py-2 bg-main rounded-lg flex mx-auto text-white items-center">
-            <span className="mr-2">Creating...</span>
+            <span className="mr-2">Approving...</span>
             <Loader />
           </button>
         ) : (
           <button
             className="px-10 py-2 bg-main rounded-lg flex mx-auto text-white"
-            onClick={() => onCreateNewsLetterClick()}
+            onClick={() => onApporveClick()}
           >
-            Create!
+            Approve
           </button>
         )
-      ) : isLoadingApproveSafe && !approveSafeStatus ? (
-        <button className="px-10 py-2 bg-main rounded-lg flex mx-auto text-white items-center">
-          <span className="mr-2">Approving...</span>
-          <Loader />
-        </button>
       ) : (
-        <button
-          className="px-10 py-2 bg-main rounded-lg flex mx-auto text-white"
-          onClick={() => onApporveClick()}
+        <IDKitWidget
+          app_id="app_staging_0142a1d230ca7cb13ce7cb8a0e94e4ac"
+          action="verifiedhumanowner"
+          onSuccess={() => setWorldCoin(true)}
+          credential_types={["orb", "phone"]}
+          enableTelemetry
         >
-          Approve
-        </button>
+          {({ open }) => (
+            <button
+              onClick={open}
+              className="px-10 py-2 bg-main rounded-lg flex mx-auto text-white items-center"
+            >
+              <Image
+                src={Woldcoin.Woldcoin1.src}
+                height={40}
+                width={40}
+                alt="Logo Image"
+              />
+              <span>Verify with World ID</span>
+            </button>
+          )}
+        </IDKitWidget>
       )}
     </div>
   );

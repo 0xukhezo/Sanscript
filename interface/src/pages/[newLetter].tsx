@@ -13,6 +13,8 @@ import {
   HomeIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
+import { CheckBadgeIcon } from "@heroicons/react/24/solid";
+
 import Link from "next/link";
 import MediumDark from "../../public/MediumDark.svg";
 import GithubDark from "../../public/GithubDark.svg";
@@ -28,7 +30,6 @@ import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import { Web3AuthOptions } from "@web3auth/modal";
 
 import { Web3AuthModalPack } from "../utils";
-import axios from "axios";
 
 const WEB3AUTH_CLIENT_ID = process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID;
 const INFURA_KEY = process.env.NEXT_PUBLIC_INFURA_KEY;
@@ -118,7 +119,7 @@ export default function NewLetter() {
   }
 
   async function fetchNewsletterByAddress() {
-    console.log(eoa);
+    console.log("eoa", eoa);
     if (eoa !== null) {
       const apiUrl = `http://localhost:3001/api/v1/newsletter/${ethers.utils.getAddress(
         eoa
@@ -222,12 +223,9 @@ export default function NewLetter() {
     try {
       let response = await client.query({ query: NewsLetters(queryBody) });
 
-      const accounts = await window.ethereum.request({
-        method: "eth_requestAccounts",
-      });
       setNewsLettersOwned(
         response.data.newsletters.filter((newsLetter: any) => {
-          return newsLetter.newsletterOwner.id === accounts[0].toLowerCase();
+          return newsLetter.newsletterOwner.id === eoa.toLowerCase();
         })
       );
     } catch (err) {
@@ -239,6 +237,7 @@ export default function NewLetter() {
     if (eoa?.toLowerCase() !== newsLetter.newsletterOwner.id) {
       addressTo = newsLetter.newsletterOwner.id;
     }
+    console.log("addressTo", addressTo);
     if (await xmtp_client?.canMessage(addressTo)) {
       const conversation = await xmtp_client.conversations.newConversation(
         addressTo
@@ -251,7 +250,7 @@ export default function NewLetter() {
       console.log("cant message because is not on the network.");
     }
   };
-
+  console.log("subscriptors", subscriptors);
   const initXmtp = async function () {
     const xmtp = await Client.create(signer, { env: "production" });
     subscriptors.forEach((value: any) => newConversation(xmtp, value));
@@ -357,7 +356,7 @@ export default function NewLetter() {
             );
 
             await waitForTransactionReceipt(txSubsblock.hash, provider);
-            // handlePaymentSuccessful();
+            initXmtp();
           } catch (error) {
             console.error("Error:", error);
           }
@@ -397,7 +396,7 @@ export default function NewLetter() {
           );
 
           await waitForTransactionReceipt(txSubsblock.hash);
-          // handlePaymentSuccessful();
+          initXmtp();
         }
       } catch (error) {
         console.log(error);
@@ -411,7 +410,10 @@ export default function NewLetter() {
     router !== undefined && fetchNewsLetters();
     router !== undefined && fetchNewsLetter(router.query.newLetter as string);
     setEoa(localStorage.getItem("eoa") as string);
-
+    const provider =
+      web3AuthModalPack &&
+      new ethers.providers.Web3Provider(web3AuthModalPack?.getProvider()!);
+    console.log(provider);
     if (typeof window.ethereum !== "undefined") {
       try {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -423,6 +425,20 @@ export default function NewLetter() {
       console.error("Metamask not found");
     }
   }, []);
+
+  useEffect(() => {
+    const type = localStorage.getItem("Web3Auth-cachedAdapter");
+    setConexionType(type);
+    router !== undefined && fetchNewsLetters();
+    router !== undefined && fetchNewsLetter(router.query.newLetter as string);
+    setEoa(localStorage.getItem("eoa") as string);
+    if (web3AuthModalPack) {
+      const provider = new ethers.providers.Web3Provider(
+        web3AuthModalPack?.getProvider()!
+      );
+      setSigner(provider.getSigner());
+    }
+  }, [web3AuthModalPack]);
 
   useEffect(() => {
     (async () => {
@@ -694,16 +710,19 @@ export default function NewLetter() {
                         )}
                     </div>
                   </div>
-                  <div className="text-sm font-light my-4">
-                    {newsLetter.newsletterOwner.id}
+                  <div className="text-sm font-light my-4 flex items-center">
+                    <span>{newsLetter.newsletterOwner.id}</span>
+                    <CheckBadgeIcon
+                      className="h-5 w-5 text-blue-500 ml-2"
+                      aria-hidden="true"
+                    />
                   </div>
                   <div className="text-lg font-light my-4">
                     {newsLetter.description}
                   </div>
                 </div>
               </div>
-
-              {isOnNetwork && messages && eoa && (
+              {isOnNetwork && messages && eoa.toLowerCase() && (
                 <div className="bg-darkBackground rounded-xl px-4 py-8 mt-4">
                   <Chat
                     conversation={convRef.current}

@@ -1,10 +1,12 @@
 import { EthHashInfo } from "@safe-global/safe-react-components";
 import { useEffect, useState } from "react";
+import * as PushAPI from "@pushprotocol/restapi";
 import {
   CHAIN_NAMESPACES,
   SafeEventEmitterProvider,
   WALLET_ADAPTERS,
 } from "@web3auth/base";
+
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import { Web3AuthOptions } from "@web3auth/modal";
 import { InjectedConnector } from "@wagmi/core";
@@ -15,6 +17,9 @@ import { BellIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { EmbedSDK } from "@pushprotocol/uiembed";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import detectEthereumProvider from "@metamask/detect-provider";
+import { ENV } from "@pushprotocol/restapi/src/lib/constants";
+import { ethers } from "ethers";
 
 const WEB3AUTH_CLIENT_ID = process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID;
 const INFURA_KEY = process.env.NEXT_PUBLIC_INFURA_KEY;
@@ -30,6 +35,7 @@ export default function NavBar({ getStatus }: NavBarProps) {
   const router = useRouter();
   const [eoa, setEoa] = useState<string>("");
   const [loginClick, setLoginClick] = useState<boolean>(false);
+  const [status, setStatus] = useState<boolean>(false);
   const [address, setAddress] = useState<string>("");
   const [web3AuthModalPack, setWeb3AuthModalPack] =
     useState<Web3AuthModalPack>();
@@ -46,18 +52,20 @@ export default function NavBar({ getStatus }: NavBarProps) {
     const signInInfo = await web3AuthModalPack.signIn();
     localStorage.setItem("eoa", signInInfo.eoa);
     connect();
+
     setAddress(signInInfo.eoa);
     setSafeAuthSignInResponse(signInInfo);
     getStatus(true);
+    setStatus(true);
     setProvider(web3AuthModalPack.getProvider() as SafeEventEmitterProvider);
   };
 
   const logout = async () => {
     if (!web3AuthModalPack) return;
-
     await web3AuthModalPack.signOut();
     localStorage.removeItem("eoa");
     getStatus(false);
+    setStatus(false);
     setProvider(null);
     setSafeAuthSignInResponse(null);
   };
@@ -117,6 +125,10 @@ export default function NavBar({ getStatus }: NavBarProps) {
   }, []);
 
   useEffect(() => {
+    setEoa(localStorage.getItem("eoa") as string);
+  }, [status]);
+
+  useEffect(() => {
     if (web3AuthModalPack && web3AuthModalPack.getProvider() && loginClick) {
       EmbedSDK.init({
         headerText: "Notifications",
@@ -161,6 +173,63 @@ export default function NavBar({ getStatus }: NavBarProps) {
     setEoa(localStorage.getItem("eoa") as string);
   }, [eoa]);
 
+  const subscribe = async () => {
+    const provider = await detectEthereumProvider({ silent: true });
+    if (localStorage.getItem("Web3Auth-cachedAdapter") === "openlogin") {
+      if (web3AuthModalPack && web3AuthModalPack.getProvider()) {
+        (async () => {
+          try {
+            const provider = new ethers.providers.Web3Provider(
+              web3AuthModalPack?.getProvider()!
+            );
+            const signer = provider.getSigner();
+            await PushAPI.channels.subscribe({
+              signer: signer,
+              channelAddress: `eip155:5:${process.env.NEXT_PUBLIC_PUSH_CHANNEL_ADDRESS}`,
+              userAddress: `eip155:5:${eoa}`,
+              onSuccess: () => {
+                console.log("opt in success");
+              },
+              onError: () => {
+                console.error("opt in error");
+              },
+              env: "local" as ENV,
+            });
+          } catch (error) {
+            console.error("Error:", error);
+          }
+        })();
+      }
+    } else {
+      try {
+        if (Boolean(provider)) {
+          const accounts = await window.ethereum.request({
+            method: "eth_requestAccounts",
+          });
+          const signer = new ethers.providers.Web3Provider(
+            window.ethereum
+          ).getSigner(accounts[0]);
+
+          const ptpt = await PushAPI.channels.subscribe({
+            signer: signer,
+            channelAddress: `eip155:5:${process.env.NEXT_PUBLIC_PUSH_CHANNEL_ADDRESS}`,
+            userAddress: `eip155:5:${eoa}`,
+            onSuccess: () => {
+              console.log("opt in success");
+            },
+            onError: () => {
+              console.error("opt in error");
+            },
+            env: "local" as ENV,
+          });
+          console.log(ptpt);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   return (
     <main
       className={
@@ -182,7 +251,7 @@ export default function NavBar({ getStatus }: NavBarProps) {
         {safeAuthSignInResponse?.eoa !== undefined ? (
           <div className="flex  items-center">
             <div className="flex items-center">
-              <button id="sdk-trigger-id">
+              <button id="sdk-trigger-id" onClick={() => subscribe()}>
                 <BellIcon className="h-6 w-6 text-main" aria-hidden="true" />
               </button>
             </div>
@@ -196,7 +265,7 @@ export default function NavBar({ getStatus }: NavBarProps) {
         ) : eoa ? (
           <div className="flex  items-center">
             <div className="flex items-center">
-              <button id="sdk-trigger-id">
+              <button id="sdk-trigger-id" onClick={() => subscribe()}>
                 <BellIcon className="h-6 w-6 text-main" aria-hidden="true" />
               </button>
             </div>

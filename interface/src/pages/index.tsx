@@ -77,7 +77,7 @@ export default function Home() {
       });
       setNewsLettersOwned(
         response.data.newsletters.filter((newsLetter: any) => {
-          return newsLetter.newsletterOwner.id === accounts[0].toLowerCase();
+          return newsLetter.newsletterOwner.id === eoa.toLowerCase();
         })
       );
     } catch (err) {
@@ -253,7 +253,7 @@ export default function Home() {
         <div className="sticky top-0">
           <NavBar getStatus={getStatus} />
         </div>
-        <div className="h-[790px] overflow-auto mx-10">
+        <div className="h-[790px]  mx-10">
           {newsLetters && newsLettersSubscribed ? (
             <Displayer
               newsLetters={newsLetters}
