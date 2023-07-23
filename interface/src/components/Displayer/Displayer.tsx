@@ -36,7 +36,7 @@ export default function Displayer({
         {newsLettersSubscribed?.length !== 0 && newsLettersSubscribed && (
           <section className="m-10">
             <h2 className="text-4xl">Subscribed Newsletters</h2>
-            <div className="flex flex-row overflow-auto max-w-[1200px]">
+            <div className="flex flex-row overflow-auto w-[1200px]">
               {newsLettersSubscribed?.map((newLetter: any, index: number) => {
                 return (
                   <div
@@ -64,7 +64,7 @@ export default function Displayer({
               return (
                 <div
                   key={index}
-                  className="max-w-[270px] bg-gray-100 my-8 mr-7 rounded-lg text-center"
+                  className="min-w-[270px] bg-gray-100 my-8 mr-7 rounded-lg text-center"
                 >
                   <NewsLetterCard
                     image={newLetter.image}
@@ -86,7 +86,7 @@ export default function Displayer({
               return (
                 <div
                   key={index}
-                  className="max-w-[270px] bg-gray-100 my-8 mr-7 rounded-lg text-center"
+                  className="min-w-[270px] bg-gray-100 my-8 mr-7 rounded-lg text-center"
                 >
                   <NewsLetterCard
                     image={newLetter.image}
