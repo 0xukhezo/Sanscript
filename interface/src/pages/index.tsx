@@ -13,6 +13,8 @@ import TwitterDark from "../../public/TwitterDark.svg";
 import Logo1 from "../../public/Logo.svg";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import ImageIpfsDisplay from "@/components/ImageIpfsDisplay/ImageIpfsDisplay";
+import { AllNewsletterQueryDocument, execute } from '../../.graphclient'
+import gql from 'graphql-tag';
 
 const Logo = { Logo1 };
 const twitterImgDark = { TwitterDark };
@@ -54,35 +56,23 @@ export default function Home() {
     []
   );
 
-  async function fetchNewsLetters() {
-    const queryBody = `query {
-      newsletters {
-        id
-        image
-        description
-        newsletterOwner {
-          id
-        }
-        pricePerMonth
-        title
-        newsletterNonce
-        }
-      }`;
+  async function fetchNewsLetters(){
+    
+    let response = await execute(AllNewsletterQueryDocument, {})
 
-    try {
-      let response = await client.query({ query: NewsLetters(queryBody) });
-      setNewsLetters(response.data.newsletters);
-      const accounts = await window.ethereum.request({
-        method: "eth_requestAccounts",
-      });
-      setNewsLettersOwned(
-        response.data.newsletters.filter((newsLetter: any) => {
-          return newsLetter.newsletterOwner.id === accounts[0].toLowerCase();
-        })
-      );
-    } catch (err) {
-      console.log({ err });
+    for await (const value of response) {
+      setNewsLetters(value.data?.newsletters);
     }
+
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    });
+    setNewsLettersOwned(
+      response.data?.newsletters.filter((newsLetter: any) => {
+        return newsLetter.newsletterOwner.id === accounts[0].toLowerCase();
+      })
+    );
+
   }
 
   const getOpenModal = (modalClose: boolean) => {
@@ -95,18 +85,18 @@ export default function Home() {
 
   const getFilteres = () => {
     const eoa = localStorage.getItem("eoa") as string;
-    const filteredOwnedNewsLetters = newsLetters.filter(
+    const filteredOwnedNewsLetters = newsLetters?.filter(
       (newsLetter: any) => newsLetter.newsletterOwner.id === eoa
     );
 
-    const filteredOtherNewsLetters = newsLetters.filter(
+    const filteredOtherNewsLetters = newsLetters?.filter(
       (newsLetter: any) => newsLetter.newsletterOwner.id !== eoa
     );
 
     setNewsLettersOwned(filteredOwnedNewsLetters);
     setNewsLetters(filteredOtherNewsLetters);
     setNewsLettersOwned(
-      newsLetters.filter((newsLetter: any) => {
+      newsLetters?.filter((newsLetter: any) => {
         return newsLetter.newsletterOwner.id === eoa?.toLowerCase();
       })
     );

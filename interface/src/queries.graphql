@@ -1,0 +1,13 @@
+query AllNewsletterQuery @live(interval: 3000) {
+      newsletters {
+        id
+        image
+        description
+        newsletterOwner {
+          id
+        }
+        pricePerMonth
+        title
+        newsletterNonce
+        }
+}
