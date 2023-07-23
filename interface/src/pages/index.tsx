@@ -13,8 +13,8 @@ import TwitterDark from "../../public/TwitterDark.svg";
 import Logo1 from "../../public/Logo.svg";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import ImageIpfsDisplay from "@/components/ImageIpfsDisplay/ImageIpfsDisplay";
-import { AllNewsletterQueryDocument, execute } from '../../.graphclient'
-import gql from 'graphql-tag';
+import { AllNewsletterQueryDocument, execute } from "../../.graphclient";
+import gql from "graphql-tag";
 
 const Logo = { Logo1 };
 const twitterImgDark = { TwitterDark };
@@ -56,9 +56,8 @@ export default function Home() {
     []
   );
 
-  async function fetchNewsLetters(){
-    
-    let response = await execute(AllNewsletterQueryDocument, {})
+  async function fetchNewsLetters() {
+    let response = await execute(AllNewsletterQueryDocument, {});
 
     for await (const value of response) {
       setNewsLetters(value.data?.newsletters);
@@ -68,11 +67,10 @@ export default function Home() {
       method: "eth_requestAccounts",
     });
     setNewsLettersOwned(
-      response.data?.newsletters.filter((newsLetter: any) => {
+      newsLetters.filter((newsLetter: any) => {
         return newsLetter.newsletterOwner.id === accounts[0].toLowerCase();
       })
     );
-
   }
 
   const getOpenModal = (modalClose: boolean) => {
@@ -250,7 +248,16 @@ export default function Home() {
               newsLettersSubscribed={newsLettersSubscribed}
             />
           ) : (
-            <div>Loading...</div>
+            <div className="h-[790px]">
+              {" "}
+              <Image
+                src={Logo.Logo1.src}
+                height={200}
+                width={200}
+                alt="Logo Image"
+                className="h-full mx-auto my-auto animate-pulse"
+              />
+            </div>
           )}
         </div>
       </section>{" "}
