@@ -210,7 +210,7 @@ export default function NavBar({ getStatus }: NavBarProps) {
             window.ethereum
           ).getSigner(accounts[0]);
 
-          const ptpt = await PushAPI.channels.subscribe({
+          await PushAPI.channels.subscribe({
             signer: signer,
             channelAddress: `eip155:5:${process.env.NEXT_PUBLIC_PUSH_CHANNEL_ADDRESS}`,
             userAddress: `eip155:5:${eoa}`,
@@ -222,7 +222,6 @@ export default function NavBar({ getStatus }: NavBarProps) {
             },
             env: "local" as ENV,
           });
-          console.log(ptpt);
         }
       } catch (error) {
         console.log(error);
@@ -251,7 +250,7 @@ export default function NavBar({ getStatus }: NavBarProps) {
         {safeAuthSignInResponse?.eoa !== undefined ? (
           <div className="flex  items-center">
             <div className="flex items-center">
-              <button id="sdk-trigger-id" onClick={() => subscribe()}>
+              <button id="sdk-trigger-id">
                 <BellIcon className="h-6 w-6 text-main" aria-hidden="true" />
               </button>
             </div>
@@ -265,7 +264,7 @@ export default function NavBar({ getStatus }: NavBarProps) {
         ) : eoa ? (
           <div className="flex  items-center">
             <div className="flex items-center">
-              <button id="sdk-trigger-id" onClick={() => subscribe()}>
+              <button id="sdk-trigger-id">
                 <BellIcon className="h-6 w-6 text-main" aria-hidden="true" />
               </button>
             </div>

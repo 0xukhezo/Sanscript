@@ -88,7 +88,58 @@ export default function NewLetter() {
   const router = useRouter();
 
   const usdcfake = "0xd55c3f5961Ec1ff0eC1741eDa7bc2f5962c3c454";
-  const lockAddress = "0x5726E5Fe247214DC0f1C2a9e590550B00962f87f";
+  const lockAddress = "0x7Af80E3881E7ECfCeEb4EeA7039B72579afFf7FD";
+
+  const test = [
+    {
+      id: "0xE6307e57dd7A85843E396Ad0bedde0d462ad861b_40",
+      image: "QmVc4gxnNLkGRuxpnaFVB5UQhqPUdqEHiSxMAWTLdBQydW",
+      description:
+        "Get the early bird access to the latest updates in the Push Protocol. This is a dummy text: But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful.",
+      newsletterOwner: {
+        id: "0xE6307e57dd7A85843E396Ad0bedde0d462ad861b",
+      },
+      pricePerMonth: "4990000000000000000",
+      title: "Push Protocol",
+      newsletterNonce: 40,
+    },
+    {
+      id: "0x8Ecf45B0f35f72907Ef2269118F5768a9Fa16be9_40",
+      image: "QmectoXTgDCTAJrccdkiVXBhSzvowvpMkxUAxUzbnvtvXg",
+      description:
+        "Get exclusive access to the latest improvements in this newsletter. Make sure you don't miss anything.This is a dummy text: But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful.",
+      newsletterOwner: {
+        id: "0x8Ecf45B0f35f72907Ef2269118F5768a9Fa16be9",
+      },
+      pricePerMonth: "9990000000000000000",
+      title: "The Graph",
+      newsletterNonce: 40,
+    },
+    {
+      id: "0x624981477F92758702D4BFc92742bD25337Bd801_40",
+      image: "QmfYAin7E5dF96uWfKfj9JkxC9HU1M4WarfEAzFrwNMgXM",
+      description:
+        "In this newsletter you will get early access to new functionalities. This is a dummy text: But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful.",
+      newsletterOwner: {
+        id: "0x624981477F92758702D4BFc92742bD25337Bd801",
+      },
+      pricePerMonth: "3990000000000000000",
+      title: "Safe Protocol",
+      newsletterNonce: 40,
+    },
+    {
+      id: "0x371Ecb716cccBE0EA88EC89ebE09006d575eEa52_40",
+      image: "QmTP9RSztWVP4Ezo2Kh88o6tVFzoNgHWTTzfSVSeo3qCLs",
+      description:
+        "Get exclusive updates about any update we make. Secret event locations and much more. This is a dummy text: But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful.",
+      newsletterOwner: {
+        id: "0x371Ecb716cccBE0EA88EC89ebE09006d575eEa52",
+      },
+      pricePerMonth: "9990000000000000000",
+      title: "APE Coin",
+      newsletterNonce: 40,
+    },
+  ];
 
   async function fetchNewsletterSuscriptor() {
     if (router) {
@@ -119,7 +170,6 @@ export default function NewLetter() {
   }
 
   async function fetchNewsletterByAddress() {
-    console.log("eoa", eoa);
     if (eoa !== null) {
       const apiUrl = `http://localhost:3001/api/v1/newsletter/${ethers.utils.getAddress(
         eoa
@@ -180,30 +230,30 @@ export default function NewLetter() {
     }
   }
 
-  // async function fetchNewsLetterByOwner(query: string) {
-  //   const queryBody = `query {newsletters(
-  //     where: {newsletterOwner_: {id: "${query.toLowerCase()}"}}
-  //   ) {
-  //     id
-  //     image
-  //     description
-  //     newsletterOwner {
-  //       id
-  //     }
-  //     pricePerMonth
-  //     title
-  //     newsletterNonce
-  //     }
-  //   }`;
+  async function fetchNewsLetterByOwner(query: string) {
+    const queryBody = `query {newsletters(
+      where: {newsletterOwner_: {id: "${query}"}}
+    ) {
+      id
+      image
+      description
+      newsletterOwner {
+        id
+      }
+      pricePerMonth
+      title
+      newsletterNonce
+      }
+    }`;
 
-  //   try {
-  //     let response = await client.query({ query: NewsLetters(queryBody) });
-  //     console.log(response);
-  //     setNewsLetter(response.data.newsletters[0]);
-  //   } catch (err) {
-  //     console.log({ err });
-  //   }
-  // }
+    try {
+      let response = await client.query({ query: NewsLetters(queryBody) });
+      console.log(response);
+      setNewsLetter(response.data.newsletters[0]);
+    } catch (err) {
+      console.log({ err });
+    }
+  }
 
   async function fetchNewsLetters() {
     const queryBody = `query {
@@ -237,7 +287,7 @@ export default function NewLetter() {
     if (eoa?.toLowerCase() !== newsLetter.newsletterOwner.id) {
       addressTo = newsLetter.newsletterOwner.id;
     }
-    console.log("addressTo", addressTo);
+
     if (await xmtp_client?.canMessage(addressTo)) {
       const conversation = await xmtp_client.conversations.newConversation(
         addressTo
@@ -250,7 +300,7 @@ export default function NewLetter() {
       console.log("cant message because is not on the network.");
     }
   };
-  console.log("subscriptors", subscriptors);
+
   const initXmtp = async function () {
     const xmtp = await Client.create(signer, { env: "production" });
     subscriptors.forEach((value: any) => newConversation(xmtp, value));
@@ -314,14 +364,6 @@ export default function NewLetter() {
     }
   }
 
-  // const handlePaymentSuccessful = async () => {
-  //   await axios.post("http://localhost:3001/api/v1/newsletter/subscription", {
-  //     newsletterOwner: ethers.utils.getAddress(newsLetter.newsletterOwner.id),
-  //     newsletterNonce: newsLetter.newsletterNonce,
-  //     recipient: eoa,
-  //   });
-  // };
-
   const onCreateNewsLetterClick = async () => {
     if (conexionType === "openlogin") {
       if (web3AuthModalPack && web3AuthModalPack.getProvider()) {
@@ -356,7 +398,6 @@ export default function NewLetter() {
             );
 
             await waitForTransactionReceipt(txSubsblock.hash, provider);
-            initXmtp();
           } catch (error) {
             console.error("Error:", error);
           }
@@ -396,7 +437,6 @@ export default function NewLetter() {
           );
 
           await waitForTransactionReceipt(txSubsblock.hash);
-          initXmtp();
         }
       } catch (error) {
         console.log(error);
@@ -413,7 +453,7 @@ export default function NewLetter() {
     const provider =
       web3AuthModalPack &&
       new ethers.providers.Web3Provider(web3AuthModalPack?.getProvider()!);
-    console.log(provider);
+
     if (typeof window.ethereum !== "undefined") {
       try {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -534,10 +574,10 @@ export default function NewLetter() {
     setEoa(localStorage.getItem("eoa") as string);
   }, [status]);
 
-  // useEffect(() => {
-  //   subscribedNewsLettersIds !== undefined &&
-  //     fetchNewsLetterByOwner(subscribedNewsLettersIds[0].newsletterOnwer);
-  // }, [subscribedNewsLettersIds]);
+  useEffect(() => {
+    subscribedNewsLettersIds !== undefined &&
+      fetchNewsLetterByOwner(subscribedNewsLettersIds[0].newsletterOnwer);
+  }, [subscribedNewsLettersIds]);
 
   return (
     <>
@@ -692,6 +732,7 @@ export default function NewLetter() {
                             </button>
                           )
                         ))}
+
                       {newsLetter.newsletterOwner.id !== eoa?.toLowerCase() &&
                         !newsLetterSuscribed && (
                           <div className="flex">
@@ -722,6 +763,7 @@ export default function NewLetter() {
                   </div>
                 </div>
               </div>
+
               {isOnNetwork && messages && eoa.toLowerCase() && (
                 <div className="bg-darkBackground rounded-xl px-4 py-8 mt-4">
                   <Chat
@@ -734,7 +776,16 @@ export default function NewLetter() {
               )}
             </div>
           ) : (
-            <div>Loading</div>
+            <div className="h-full">
+              {" "}
+              <Image
+                src={Logo.Logo1.src}
+                height={200}
+                width={200}
+                alt="Logo Image"
+                className="h-full mx-auto my-auto animate-pulse"
+              />
+            </div>
           )}
         </section>{" "}
         {openModal && <CreateNewsLetterModal getOpenModal={getOpenModal} />}
